@@ -1,0 +1,15 @@
+ROLL NO: 11, 12, 13, 14, 35
+Unit 5 : List
+Basic Concept, 
+List and ADT, 
+Array Implementation of Lists, 
+Linked List
+	Types of Linked List: 
+		Singly Linked List, 
+		Doubly Linked List, 
+		Circular Linked List.
+Basic operations in Linked List: 
+	Node Creation , 
+	Insertion and 
+	Deletion from Linked List
+Stack and Queue as Linked List
