@@ -1,0 +1,125 @@
+---
+title: "Word Cloud"
+author: "Kaushal Khatiwada"
+date: "2024-04-23"
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r warning=FALSE}
+library(rvest)
+library(tm)
+library(wordcloud)
+```
+
+```{r}
+urls<- "https://thehimalayantimes.com/opinion/navigating-nepals-digital-frontier-understanding-cybersecurity-in-the-digital-age-ensuring-data-safety-and-the-role-of-ai"
+```
+
+```{r}
+
+texts <- read_html(urls) %>% 
+  html_nodes("p") %>%   #Get <p> HTML tag
+  html_text()   
+```
+
+Combine all the text into a single corpus
+```{r}
+myCorpus <- Corpus(VectorSource(texts))
+```
+
+
+```{r}
+inspect(myCorpus[17:20])
+```
+## Text Cleaning
+1) Convert to a lowercase
+```{r warning=FALSE}
+text <- tm_map(myCorpus, content_transformer(tolower))
+inspect(text[17:20])
+```
+
+2) Remove Numbers
+```{r warning=FALSE}
+text <- tm_map(text, removeNumbers)
+inspect(text[17:20])
+```
+3) Remove Punctuation
+```{r warning=FALSE}
+text <- tm_map(text, removePunctuation)
+inspect(text[17:20])
+```
+4) Remove URL
+```{r warning=FALSE}
+removeURL <- function(X) gsub("http[^[:space:]]*","",X)
+text <- tm_map(text,removeURL)
+inspect(text[17:20])
+```
+5) Remove Stopwords.
+```{r warning=FALSE}
+text <- tm_map(text, removeWords, stopwords("english"))
+inspect(text[17:20])
+```
+6) Remove Whitespaces.
+```{r warning=FALSE}
+text <- tm_map(text, stripWhitespace)
+inspect(text[17:20])
+```
+
+## Stemming and lemmatization
+Stemming is a text normalization technique used in natural language processing 
+(NLP) that reduces words to their root or base form to enhance language understanding.
+Example {remove suffixes} : stem of these three words, "connections", "connected", "connects", is “connect”.
+
+Lemmatization analyzes the contexts of the sentences.
+Example: “Saw” would return as “see” or “saw” depending on the context of the word.
+
+```{r}
+# Backup the text just in case
+backup_text <- text
+```
+
+```{r warning=FALSE}
+backup_text <- tm_map(backup_text, stemDocument)
+inspect(backup_text[17:20])
+```
+It might not be good idea to use stemming in some cases because "artifici","intellig" is not the real words. So ww will not be using stemmed words.
+
+## Term-Document matrix
+Text-Document Matrix represent the text data in the form of a matrix where row correspond to the term in the document and columns correspond to the document in the corpus and cells correspond to the weights of the term. 
+```{r}
+mytdm <- TermDocumentMatrix(text,control = list(wordLengths = c(1,Inf)))
+mymatrix <- as.matrix(mytdm)
+inspect(mytdm)
+```
+Term Frequency represent the frequency of terms in the document.
+
+```{r}
+freq.terms <- findFreqTerms(mytdm, lowfreq = 2)
+freq.terms
+```
+To search for term associated with "ai" with correlation coefficient of at least 0.2
+```{r}
+findAssocs(mytdm, "ai", 0.2)
+```
+
+```{r}
+freq <- sort(rowSums(mymatrix),decreasing = TRUE)
+
+```
+
+```{r}
+library(RColorBrewer)
+```
+
+## Word Cloud
+```{r warning=FALSE}
+set.seed(123)
+wordcloud(words = names(freq), freq = freq, min.freq  = 2, random.order = FALSE, colors = brewer.pal(8,"Dark2"))
+```

@@ -1,0 +1,253 @@
+---
+title: "Automobile"
+author: "Kaushal Khatiwada"
+date: "2024-04-19"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Assignment 2
+
+```{r warning=FALSE,}
+library("tidyverse")
+library("dplyr")
+```
+
+## A) Data Collection
+Import Retail Store sales dataset in a command-seperated file.
+```{r}
+car <- read.csv("car dataset.txt", na.strings = "?")
+```
+
+## B) Data Inspection
+
+```{r}
+head(car)
+```
+```{r}
+colnames(car) <- c("symboling", "normalized-losses", "make","fuel-type","aspiration",
+                   "num-of-doors","body-style","drive-wheels","engine-location",
+                   "wheel-base","length","width","height","curb-weight","engine-type",
+                   "num-of-cylinders","engine-size","fuel-system","bore","stroke",
+                   "compression-ratio","horsepower","peak-rpm","city-mpg","highway-mpg",
+                   "price")
+```
+
+  1. symboling:                -3, -2, -1, 0, 1, 2, 3.
+  2. normalized-losses:        continuous from 65 to 256.
+  3. make:                     
+                               alfa-romero, audi, bmw, chevrolet, dodge, honda,
+                               isuzu, jaguar, mazda, mercedes-benz, mercury,
+                               mitsubishi, nissan, peugot, plymouth, porsche,
+                               renault, saab, subaru, toyota, volkswagen, volvo
+
+  4. fuel-type:                diesel, gas.
+  5. aspiration:               std, turbo.
+  6. num-of-doors:             four, two.
+  7. body-style:               hardtop, wagon, sedan, hatchback, convertible.
+  8. drive-wheels:             4wd, fwd, rwd.
+  9. engine-location:          front, rear.
+ 10. wheel-base:               continuous from 86.6 120.9.
+ 11. length:                   continuous from 141.1 to 208.1.
+ 12. width:                    continuous from 60.3 to 72.3.
+ 13. height:                   continuous from 47.8 to 59.8.
+ 14. curb-weight:              continuous from 1488 to 4066.
+ 15. engine-type:              dohc, dohcv, l, ohc, ohcf, ohcv, rotor.
+ 16. num-of-cylinders:         eight, five, four, six, three, twelve, two.
+ 17. engine-size:              continuous from 61 to 326.
+ 18. fuel-system:              1bbl, 2bbl, 4bbl, idi, mfi, mpfi, spdi, spfi.
+ 19. bore:                     continuous from 2.54 to 3.94.
+ 20. stroke:                   continuous from 2.07 to 4.17.
+ 21. compression-ratio:        continuous from 7 to 23.
+ 22. horsepower:               continuous from 48 to 288.
+ 23. peak-rpm:                 continuous from 4150 to 6600.
+ 24. city-mpg:                 continuous from 13 to 49.
+ 25. highway-mpg:              continuous from 16 to 54.
+ 26. price:                    continuous from 5118 to 45400.
+ 
+
+```{r}
+str(car)
+
+```
+
+Dimensions of dataset.
+```{r}
+dim(car)
+```
+
+Identifying missing value
+```{r}
+colSums(is.na(car))
+```
+"normalized-losses": 40 missing data
+"num-of-doors": 2 missing data
+"bore": 4 missing data
+"stroke" : 4 missing data
+"horsepower": 2 missing data
+"peak-rpm": 2 missing data
+"price": 4 missing data
+
+
+##c) Data Cleaning
+Handling Missing Values
+
+For Normalized-losses, since it is continuous variable. we will fill NA with its mean value.
+```{r}
+car %>% 
+  filter(is.na(`normalized-losses`))
+```
+
+```{r}
+car <- car %>% 
+  mutate(
+    `normalized-losses` = replace_na(`normalized-losses`, mean(`normalized-losses`, na.rm = TRUE))
+    )
+
+```
+
+For num-of-doors, since it has discrete value. we will fill NA with mode (highest number of occurrences)
+```{r}
+car %>% 
+  filter(is.na(`num-of-doors`))
+```
+
+```{r}
+table(car$`num-of-doors`)
+
+```
+Car with 4 door has highest occurrence.
+
+```{r}
+mode <- names(which.max(table(car$`num-of-doors`)))
+```
+
+```{r}
+car <- car %>% 
+  mutate(
+    `num-of-doors` = ifelse(is.na(`num-of-doors`), mode, `num-of-doors`)
+    )
+```
+
+For bore, it is also continous variable. we will fill NA with its mean value.
+```{r}
+car %>% 
+  filter(is.na(bore))
+```
+
+```{r}
+car <- car %>% 
+  mutate(
+    bore = replace_na(bore, mean(bore, na.rm = TRUE))
+    )
+
+```
+
+For Stoke, it is also continous variable. we will fill NA with its mean value.
+```{r}
+car %>% 
+  filter(is.na(stroke))
+```
+
+```{r}
+car <- car %>% 
+  mutate(
+    stroke = replace_na(stroke, mean(stroke, na.rm = TRUE))
+    )
+```
+
+For Horse Power
+```{r}
+car %>% 
+  filter(is.na(horsepower))
+```
+```{r}
+car <- car %>% 
+  mutate(
+    horsepower = ifelse(is.na(horsepower), mean(horsepower, na.rm = TRUE), horsepower)
+  )
+```
+
+For Peak RPM
+```{r}
+car %>% 
+  filter(is.na(`peak-rpm`))
+```
+
+```{r}
+car <- car %>% 
+  mutate(
+    `peak-rpm` = ifelse(is.na(`peak-rpm`), mean(`peak-rpm`, na.rm = TRUE), `peak-rpm`)
+  )
+
+```
+
+
+Price is the output label to predict in basis of these feature to discover pattern. So, row with missing price value  must be droped. But still we will fill with the average price.
+```{r}
+car %>% 
+  filter(is.na(price))
+```
+```{r}
+car <- car %>% 
+  mutate(
+    price = ifelse(is.na(price), mean(price, na.rm = TRUE), price)
+  )
+
+```
+
+```{r}
+colSums(is.na(car))
+
+```
+
+Check Duplicates
+```{r}
+sum(duplicated(car))
+```
+## EDA
+- Univariate Analysis: Studying one variable at a time
+- Bivariate Analysis: Studying two variables at a time
+- Multivariate Analysis: Studying multiple variables at a time
+
+## Univariate Analysis
+
+```{r}
+door_num <- table(car$`num-of-doors`)
+barplot(door_num ,
+        main = "Number of doors",
+        xlab = "Number of doors",
+        ylab = "Count",
+        col = "blue") 
+```  
+```{r}
+engine_type <- table(car$`engine-type`)
+barplot(engine_type ,
+        main = "Engine Type",
+        xlab = "Engines",
+        ylab = "Count",
+        col = "red") 
+
+```
+```{r}
+makes <- table(car$make)
+barplot(makes ,
+        main = "Manufacture Company",
+        ylab = "Count",
+        col = "green",
+        las=2) 
+
+```
+
+## Bivariate Analysis
+```{r}
+
+plot(car$horsepower,car$price)
+
+```
+

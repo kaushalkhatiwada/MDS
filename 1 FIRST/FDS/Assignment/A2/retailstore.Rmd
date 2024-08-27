@@ -1,0 +1,325 @@
+---
+title: "Retail Store Sales"
+author: "Kaushal Khatiwada"
+date: "2024-04-19"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Data Wrangling
+
+a)Data Collection 
+b)Data Inspection
+c)Data Cleaning
+      Handling Missing Values 
+      Removing Duplicates
+      Standardizing Formats
+d)Exploratory Data Analysis (EDA)
+
+
+```{r warning=FALSE}
+library(tidyverse)
+library(dplyr)
+library(tidyr)
+```
+
+## A) Data Collection
+Import Retail Store sales dataset in a command-seperated file.
+```{r}
+sales<- read.csv("Sales.csv")
+```
+
+## B) Data Inspection
+Summary of the structure of a dataset.
+```{r}
+str(sales)
+```
+
+Dimensions of dataset.
+```{r}
+dim(sales)
+```
+
+Display few rows of dataset.
+```{r}
+head(sales)
+```
+
+```{r}
+colnames(sales)
+```
+ 1. Invoice id: Computer generated sales slip invoice identification number
+
+ 2. Branch: Branch of supercenter (3 branches are available identified by A, B and C).
+
+ 3. City: Location of supercenters
+
+ 4. Customer type: Members for customers using member card and Normal for without member card.
+
+ 5. Gender: Gender type of customer
+
+ 6. Product line: General item categorization groups - Electronic accessories, Fashion accessories, Food and beverages, Health and beauty, Home and lifestyle, Sports and travel
+
+ 7. Unit price: Price of each product in USD
+
+ 8. Quantity: Number of products purchased by customer
+
+ 9. Tax: 5% tax fee for customer buying
+
+ 10. Total: Total price including tax
+
+ 11. Date: Date of purchase (Record available from January 2019 to March 2019)
+
+ 12. Time: Purchase time (10am to 9pm)
+
+ 13. Payment: Payment Type – Cash, Credit card and Ewallet)
+
+ 14. COGS: Cost of goods sold
+
+ 15. Gross margin percentage: Gross margin percentage
+
+ 16. Gross income: Gross income
+
+ 17. Rating: Customer rating on shopping experience (On a scale of 1 to 10)
+ 
+ 
+```{r}
+colSums(is.na(sales))
+```
+
+
+```{r}
+sum(duplicated(sales))
+```
+There is no duplicate records.
+
+## c) Data Cleaning
+Handling Missing Values
+For Unit Price
+
+```{r}
+sales %>% filter(!complete.cases(sales$Unit.price))
+```
+2 records are NA. So, fill the NA as 
+Unit price = (Total - 5% Tax)/Quantity
+
+```{r}
+sales<- sales %>% 
+  mutate(Unit.price = ifelse(is.na(Unit.price),(Total - Tax.5.)/Quantity,Unit.price))
+```
+
+
+```{r}
+colSums(is.na(sales))
+
+```
+For Quantity
+
+```{r}
+sales %>% 
+  filter(!complete.cases(Quantity))
+```
+16 records are NA. So, fill the NA as 
+
+(Total - 5% Tax)/Unit price
+
+```{r}
+sales<- sales %>% 
+  mutate(Quantity = ifelse(is.na(Quantity),(Total - Tax.5.)/Unit.price,Quantity))
+```
+
+```{r}
+
+colSums(is.na(sales))
+
+```
+
+
+For 5% Tax
+
+```{r}
+sales %>% 
+  filter(!complete.cases(Tax.5.))
+```
+14 records are NA. So, fill the NA as 
+
+Total - (Unit price * Quantity)
+```{r}
+sales<- sales %>% 
+  mutate(Tax.5. = ifelse(is.na(Tax.5.),Total - (Unit.price * Quantity),Tax.5.))
+```
+
+```{r}
+
+colSums(is.na(sales))
+
+```
+For Total
+```{r}
+sales %>% 
+  filter(!complete.cases(Total))
+```
+14 records are NA. So, fill the NA as 
+
+(Unit price * Quantity) + 5% Tax
+```{r}
+sales<- sales %>% 
+  mutate(Total = ifelse(is.na(Total),(Unit.price * Quantity) + Tax.5.,Total))
+```
+
+```{r}
+
+colSums(is.na(sales))
+
+```
+For Gross Margin Percentage
+```{r}
+sales %>% 
+  filter(!complete.cases(gross.margin.percentage))
+```
+```{r}
+table(sales$gross.margin.percentage)
+```
+Here, Gross Margin Percentage is 4.761904762, So, fill NA as 4.761904762
+```{r}
+sales<- sales %>% 
+  mutate(gross.margin.percentage = ifelse(is.na(gross.margin.percentage),4.761904762,gross.margin.percentage))
+```
+
+```{r}
+
+colSums(is.na(sales))
+
+```
+## EDA
+- Univariate Analysis: Studying one variable at a time
+- Bivariate Analysis: Studying two variables at a time
+- Multivariate Analysis: Studying multiple variables at a time
+
+
+## Univariate Analysis
+```{r}
+branches <- table(sales$Branch)
+branches
+```
+```{r}
+barplot(branches,
+        main = "Branch",
+        xlab = "Branches",
+        ylab = "Count",
+        col = "blue") 
+```  
+
+
+```{r}
+cities <- table(sales$City)
+cities
+```
+```{r}
+barplot(cities,
+        main = "City",
+        xlab = "City",
+        ylab = "Count",
+        col = "red")  # Bar color
+        
+```
+
+```{r}
+cust_type <- table(sales$Customer.type)
+cust_type
+```
+```{r}
+barplot(cust_type,
+        main = "Customer Type",
+        xlab = "Cutomers",
+        ylab = "Count",
+        col = "green")
+```  
+
+
+```{r}
+gender_type <- table(sales$Gender)
+gender_type
+```
+```{r}
+gender_lbl <- paste(gender_type)
+pie(gender_type, 
+    main = "Gender",
+    col= c("red","blue"),
+    label=gender_lbl)
+legend("topright",names(gender_type),
+       cex = 0.8, fill = c("red","blue"))
+  
+
+```
+
+```{r}
+product_line <- table(sales$Product.line)
+product_line
+```
+
+```{r}
+par(pin = c(4, 2))
+barplot(product_line,
+        main = "Product line",
+        ylab = "Count",
+        las= 2,
+        col = rainbow(6))
+
+legend("topright",  
+       legend = names(product_line), 
+       fill = rainbow(6),  
+       title = "Product Lines",  
+       cex = 0.8,)  
+```
+
+
+```{r}
+payment_type <- table(sales$Payment)
+payment_type
+```
+3 records are not categorized under any category. SO, fill with mode categorical value.
+```{r}
+mode_cat<- names(payment_type)[which.max(payment_type)]
+mode_cat
+```
+Replace the null value with "Ewallet."
+
+```{r}
+sales$Payment[sales$Payment == ""] <- mode_cat
+```
+
+```{r}
+payment_type <- table(sales$Payment)
+payment_type
+```
+
+```{r}
+barplot(payment_type,
+        main = "Payment Type",
+        ylab = "Count",
+        col = rainbow(3))
+
+legend("topright",  
+       legend = names(payment_type), 
+       fill = rainbow(3),  
+       title = "Product Lines",  
+       cex = 0.8)  
+```
+
+For Invoice ID
+```{r}
+length(unique(sales$Invoice.ID))
+```
+9 out of 1000 record have missing Invoice ID.
+
+
+
+
+
+
