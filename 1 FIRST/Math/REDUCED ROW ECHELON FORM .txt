@@ -1,0 +1,6 @@
+REDUCED ROW ECHELON FORM 
+A matrix is in reduced row echelon form, normally abbreviated to rref, if it satisfies all the following conditions:
+ 1. If there are any rows containing only zero entries then they are located in the bottom part of the matrix.
+ 2. If a row contains non-zero entries then the first non-zero entry is a 1.This 1 is called a leading 1.
+ 3. The leading 1’s of two consecutive non-zero rows go strictly from top left to bottom right of the matrix.
+ 4. The only non-zero entry in a column containing a leading 1 is the leading 1.
