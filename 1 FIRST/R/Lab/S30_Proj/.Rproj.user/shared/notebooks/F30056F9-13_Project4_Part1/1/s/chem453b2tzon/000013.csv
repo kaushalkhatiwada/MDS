@@ -1,0 +1,7 @@
+"0","aq <- airquality"
+"0","aq_means<- tapply(aq$Wind,aq$Month,mean) #Mean"
+"0","aq_sd <- tapply(aq$Wind,aq$Month,sd)     #Standard Deviation"
+"0","aq_table <- data.frame(Month = names(aq_means), "
+"0","                            Mean_of_Wind = as.numeric(aq_means), "
+"0","                            SD_of_Wind = as.numeric(aq_sd))"
+"0","aq_table"

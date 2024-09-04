@@ -1,0 +1,278 @@
+---
+title: "MDS503"
+author: '8016013'
+date: "2024-06-27"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## 6
+```{r}
+##--------
+
+library(igraph) 
+#a
+#Defining a graph object
+g1<-graph(c("R","S","S","T","T","R","R","T","U","S"))
+
+#b
+plot(g1,vertex.color="green",vertex.size=30,edge.color="red",edge.size=5)
+#this graph represent the relation between various nodes
+
+#c
+degree(g1)
+#degree states that how many relations a single node is holding then
+#from the result we see that R,S,T have 3 relations but U has only one relation
+
+closeness(g1)
+#closeness of the nodes is how close the node is with the other nodes
+
+betweenness(g1) #it gives how many nodes have the relation with that node 
+#here S has 2 betweenness that means 2 nodes have relation with S
+
+#d
+# Identify hubs in the graph
+hubs <- which(degree(g1) == max(degree(g1)))
+hubs
+#Hubs in a graph refer to nodes with high connectivity or degree that
+# serve as central points of the network.
+
+# Find communities in the graph
+communities <- cluster_walktrap(g1)
+cat("Number of communities: ", length(communities), "\n")
+
+# Visualize the graph with communities highlighted
+plot(communities, g1)
+#Communities in a graph represent groups of nodes that are more densely connected
+#within the group compared to connections between groups
+
+
+```
+
+## 7
+```{r}
+# a
+getwd()
+library(pdftools)
+library(tm)
+library(wordcloud)
+library(RColorBrewer)
+library(topicmodels)
+# a
+getwd()
+
+# Specify the path to your PDF file
+#Question b
+pdf_file <- "R-intro.pdf"
+
+
+library(tm)
+#Question c
+# Extract text from PDF using pdftools
+pdf_text <- pdf_text(pdf_file)
+
+# Convert the text into a corpus using tm package
+corpus <- Corpus(VectorSource(pdf_text))
+
+# Preprocessing: Convert to lower case, remove numbers and punctuation
+corpus <- tm_map(corpus, content_transformer(tolower))
+corpus <- tm_map(corpus, removeNumbers)
+corpus <- tm_map(corpus, removePunctuation)
+corpus <- tm_map(corpus, removeWords, stopwords("en"))  # Remove English stopwords
+
+# Strip whitespace
+corpus <- tm_map(corpus, stripWhitespace)
+corpus<-tm_map(corpus,stemDocument)
+
+#Question d
+# Create Document Term Matrix
+myTdm<- TermDocumentMatrix(corpus,control = list(wordLengths=c(1,Inf)))
+
+
+# Get term frequencies
+(freq.terms<-findFreqTerms(myTdm,lowfreq = 150))
+
+# Subset term frequencies for most frequent terms
+m<-as.matrix(myTdm)
+# Sort frequencies in descending order
+(freq<-sort(rowSums(m),decreasing = T))
+
+new_freq<-freq[freq>50]
+new_freq
+# Extract words (terms) and their frequencies
+words <- names(new_freq)
+words
+
+max(freq)
+
+# Create barplot #Better
+barplot(new_freq, 
+        main = "Frequency of Most Frequent Terms",
+        xlab = "Terms",
+        ylab = "Frequency",
+        names.arg = words,  # Display words on x-axis
+        las = 2,  # Rotate x-axis labels if needed
+        col = "skyblue")  # Specify color if desired
+
+```
+
+
+## 8
+```{r}
+library(car)
+data(airquality)
+
+# a) shapiro-Wilk test of Normality Test
+aq <- airquality
+str(aq)
+#Here the number of observations is greater than 100, so we do ks test for
+#normality
+shapiro_test_result<-shapiro.test(aq$Wind)
+shapiro_test_result
+# Here, p value is greater than 0.05 so, it follows normal distribution.
+
+# b) Variance Test
+# for equality of variance
+# Perform a Bartlett test to compare variances of wind data by month
+bartlett.test(Wind ~ Month, data = aq)
+#Here, p value is greater than 0.05, thus the variance of wind with respect to
+#months are equal
+
+#c
+#Fitting one way anova
+anova_test<- oneway.test(aq$Wind~factor(aq$Month), var.equal = TRUE)
+anova_test
+(anova_model <- aov(Wind ~ as.factor(Month), data = aq))
+#Interpretation: Here, the p value is less than 0.05, thus the mean wind speed 
+#in various months are different is not equal.
+
+
+#d
+# Apply TukeyHSD to the ANOVA model
+tukey_result <- TukeyHSD(anova_model)
+print(tukey_result)
+# Interpretation: The pairs in  which p value is less than 0.05 ie. 7-5 month and
+# 8-5 month has difference in mean wind. ALl other pairs have similar mean
+#wind values.
+```
+
+
+## 9
+```{r}
+
+data<-USArrests
+head(data)
+str(data)
+
+# a Split 70 30 
+set.seed(13)
+ind <- sample(2, nrow(data), 
+              
+              replace=T, prob = c(0.7, 0.3))
+
+train <- data[ind==1,]
+
+test <- data[ind==2,]
+
+# b) fit linear and KNN
+# Load necessary libraries
+library(ggplot2)
+# For plotting
+library(caret) 
+
+linear_model <- lm(UrbanPop ~ Murder + Assault + Rape, data=data)
+#  Fit the linear regression  using lm function.
+
+summary(linear_model)
+# Check the model summary
+# Load necessary libraries
+library(caret)
+
+# Standardize the data
+preProc <- preProcess(data[, -3], method=c("center", "scale"))
+data_std <- predict(preProc, data[, -3])
+
+# Add the dependent variable back
+data_std$UrbanPop <- data$UrbanPop
+
+# Define the control method for training
+train_control <- trainControl(method="cv", number=10)
+
+# Train the KNN model
+knn_model <- train(UrbanPop ~ Murder + Assault + Rape, data=data_std, method="knn", trControl=train_control, tuneLength=10)
+
+# Check the results
+print(knn_model)
+plot(knn_model)
+
+# c) predict in test data
+linear_predictions <- predict(linear_model, test)
+linear_predictions
+
+
+knn_predictions <- predict(knn_model, test)
+knn_predictions
+
+
+#d) comparing the model
+linear_mse <- mean((test$UrbanPop - linear_predictions)^2)
+linear_rmse <- sqrt(linear_mse)
+linear_r2 <- 1 - (sum((test$UrbanPop - linear_predictions)^2) / sum((test$UrbanPop - mean(test$UrbanPop))^2))
+linear_mse
+linear_rmse
+linear_r2
+
+
+knn_mse <- mean((test$UrbanPop - knn_predictions)^2)
+knn_rmse <- sqrt(knn_mse)
+knn_r2 <- 1 - (sum((test$UrbanPop - knn_predictions)^2) / sum((test$UrbanPop - mean(test$UrbanPop))^2))
+
+knn_mse
+knn_rmse
+knn_r2
+
+#from the above value we can conclude that the we can choose linear _mse
+#linear mse is less so we can choose linear model 
+#at last linear model is better than knn from this result
+
+```
+
+
+## 10
+```{r}
+
+ir_label <- iris$Species
+ir_data <- iris[,-5]
+head(ir_data)
+
+## A) Hierarchical clustering using average
+data.dist <- dist(ir_data)
+plot(hclust(data.dist, method = "average"), xlab = "", sub = "", ylab = "",
+     labels = ir_label, main = "Average Linkage")
+
+## B) Best value is provided by average linkage
+plot(hclust(data.dist, method = "average"), xlab = "", sub = "", ylab = "",
+     labels = ir_label, main = "Average Linkage")
+
+abline(h = 1.85, col = "red")
+
+
+## C) fit k-mean clustering
+kmeans.c3<-kmeans(ir_data,centers = 3,nstart = 20)
+kmeans.c3
+
+
+#d) compare using confusion matrix
+cm<-table(iris$Species,kmeans.c3$cluster)
+cm
+
+(accuracy<-
+    sum(diag(cm))/sum(cm))
+# Accuracy of k-mean clustering is 0.893 while size of cluster is 3. so we can use it.
+```

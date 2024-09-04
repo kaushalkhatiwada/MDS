@@ -1,0 +1,76 @@
+# Part IV
+
+
+# Load necessary libraries. The arules library is used for mining 
+# association rules and frequent itemsets. The arulesViz library provides 
+# visualization techniques for the arules package.
+library(arules)
+library(arulesViz)
+
+
+
+# Load Groceries data
+# The Groceries dataset is loaded. It contains transaction data where each 
+# transaction represents items purchased together.
+# Check the structure of the Groceries data
+data(Groceries)
+
+# The str function shows the structure of the Groceries dataset.
+str(Groceries)
+
+
+
+# Plot item frequencies for the top 20 items
+# This plot helps identify which items are most commonly purchased, 
+# indicating their popularity.
+itemFrequencyPlot(Groceries, 
+                  topN = 20, 
+                  type = "absolute", 
+                  main = "Top 20 Frequent Items in Groceries Data")
+
+
+
+# Set a priori rule with support = 0.001 and confidence = 0.8
+rules <- apriori(Groceries, 
+                 parameter = list(supp = 0.001, 
+                                  conf = 0.8))
+
+# Summary of the rules generated
+# The generated rules show strong associations between items that are frequently bought together.
+summary(rules)
+
+
+# Show the top five rules using inspect
+# Rules with a higher lift indicate stronger associations, meaning items are 
+# more likely to be bought together than by chance.
+rules <- sort(rules, by = "lift", decreasing = TRUE)
+top5_rules <- head(rules, 5)
+quality(top5_rules) <- round(quality(top5_rules), digits = 2)
+inspect(top5_rules)
+
+
+
+# Sort the rules by confidence in decreasing order
+# Higher confidence indicates a stronger relationship where the presence of 
+# items in the left-hand side (lhs) often leads to the presence 
+# of items in the right-hand side (rhs).
+rules_sorted_by_confidence <- sort(rules, by = "confidence", decreasing = TRUE)
+head(rules_sorted_by_confidence, 5)
+
+
+# Use "whole milk" as target item in lhs
+# The code below shows which items are frequently bought together with whole
+# milk, revealing customers' common purchase patterns when they buy whole milk.
+
+whole_milk_rules_lhs <- subset(rules, lhs %in% "whole milk")
+whole_milk_rules_sorted_by_confidence_lhs <- 
+  sort(whole_milk_rules_lhs, by = "confidence", decreasing = TRUE)
+head(whole_milk_rules_sorted_by_confidence_lhs, 5)
+
+# Use "whole milk" as target item in rhs
+# This reveals which items are likely to be bought when whole milk is 
+# part of the transaction, highlighting complementary products to whole milk.
+whole_milk_rules_rhs <- subset(rules, rhs %in% "whole milk")
+whole_milk_rules_sorted_by_confidence_rhs <- 
+  sort(whole_milk_rules_rhs, by = "confidence", decreasing = TRUE)
+head(whole_milk_rules_sorted_by_confidence_rhs, 5)

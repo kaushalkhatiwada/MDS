@@ -1,0 +1,73 @@
+---
+title: "Project 2 Part 3"
+author: "Kaushal Khatiwada"
+date: "2024-03-18"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Word Cloud
+
+```{r warning=FALSE}
+library(pdftools)
+library(tm)
+library(wordcloud)
+library(RColorBrewer)
+```
+
+
+lapply function is used to apply pdf_text function to all the element of list "pdfs"
+```{r warning=FALSE}
+setwd("~/MDS503P2")
+pdfs <- list.files(pattern="*.pdf")
+alltext <- lapply(pdfs, pdf_text)
+```
+
+```{r}
+
+alltext <- unlist(alltext)
+head(alltext,n=4)
+```
+create a single Corpus object containing all the text data, rather than separate Corpus objects for each PDF.
+```{r warning=FALSE}
+
+myCorpus <- Corpus(VectorSource(alltext))
+
+myCorpus <- tm_map(myCorpus, content_transformer(tolower))
+myCorpus <- tm_map(myCorpus,removePunctuation)
+myCorpus <- tm_map(myCorpus,removeNumbers)
+removeURL <- function(X) gsub("http[^[:space:]]*","",X)
+myCorpus <- tm_map(myCorpus, content_transformer(function(x) gsub("\\\n", " ", x)))
+myCorpus <- tm_map(myCorpus,removeURL)
+myCorpus <- tm_map(myCorpus,removeWords,stopwords("english"))
+myCorpus <- tm_map(myCorpus,removeWords,c("can","may","eg","ie","h","b","p","k","g","q","set","used"))
+myCorpus <- tm_map(myCorpus, content_transformer(function(x) gsub("\n*","", x)))
+myCorpus <- tm_map(myCorpus,stripWhitespace)
+
+inspect(myCorpus[1:2])
+```
+
+
+```{r}
+
+myTdm <- TermDocumentMatrix(myCorpus,control = list(wordLengths=c(2,Inf)))
+m <- as.matrix(myTdm)
+freq <- sort(rowSums(m),decreasing = T)
+
+```
+
+
+## Word Cloud
+```{r}
+
+set.seed(1234)
+wordcloud(words=names(freq),freq=freq, min.freq = 150,random.order = F,
+          max.words = 120, colors = brewer.pal(8,"Dark2"),
+          rot.per = 0.35,scale = c(5, 0.3),)
+
+```

@@ -1,0 +1,13 @@
+Here are more resources on regression models:
+
+KNN Regression: https://www.youtube.com/watch?v=XClnbOTRQmA (with Bias-Variance tradeoff) 
+
+ANN Regression: https://www.youtube.com/watch?v=eDcPolK_j8E (time series data)
+
+Regression Tree: https://www.youtube.com/watch?v=6SMrjEwFiQY (39 minutes for regression)
+
+SVM Regression: https://www.youtube.com/watch?v=DBApaR2mTg0
+
+We will start the supervised learning with classification models on Tuesday!
+
+Happy learning!

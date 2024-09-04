@@ -1,0 +1,4 @@
+"0","library(ISLR2)"
+"0","nci.data <- NCI60$data"
+"0","nci.labs <- NCI60$labs"
+"0","sd.data <- scale(nci.data)"

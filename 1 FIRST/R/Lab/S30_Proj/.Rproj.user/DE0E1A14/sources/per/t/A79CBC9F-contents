@@ -1,0 +1,60 @@
+---
+title: "Project 5 Part 3"
+author: "Kaushal Khatiwada"
+date: "2024-05-13"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Use NCI60 data of ISLR2 package
+  
+## A) Scale the nci.data as sd.data object
+```{r}
+library(ISLR2)
+nci.data <- NCI60$data
+nci.labs <- NCI60$labs
+sd.data <- scale(nci.data)
+```
+
+## B) Fit hierarchical cluster analysis on the sd.data using complete, average and single linkage methods, show the results with dendrogram and interpret them carefully
+```{r}
+par(mfrow = c(1,3))
+data.dist <- dist(sd.data)
+plot(hclust(data.dist), xlab = "", sub = "", ylab = "",
+     labels = nci.labs, main = "Complete Linkage")
+plot(hclust(data.dist, method = "average"), xlab = "", sub = "", ylab = "",
+     labels = nci.labs, main = "Average Linkage")
+plot(hclust(data.dist,method = "single"), xlab = "", sub = "", ylab = "",
+     labels = nci.labs, main = "Single Linkage")
+```
+
+## C Find the best number for clusters using “cutree” function with best distance value
+```{r}
+clusters <- hclust(dist(sd.data))
+trees <- cutree(clusters, 3)
+table(trees, nci.labs)
+```
+
+## D) Use your roll number as set.seed and perform k-means clustering on sd.data with the best number of clusters/distance value with nstart=20
+```{r}
+set.seed(13)
+km <- kmeans(sd.data, center=3, nstart = 20)
+km.clusters <- km$cluster
+```
+
+## E) Get summary of the k-means clustering and interpret them carefully
+```{r}
+summary(km.clusters)
+```
+
+## F) Plot this k-means results using base r plot and cluster package and interpret them carefully
+```{r}
+par(mfrow = c(1,1))
+plot(nci.data,col=km.clusters)
+points(km$centers)
+```

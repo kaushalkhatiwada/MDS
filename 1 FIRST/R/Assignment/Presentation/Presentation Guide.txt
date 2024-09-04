@@ -1,0 +1,29 @@
+Saturday 11 May 2024 presentation 
+(each will get 5 minutes for presentation, 5-7 slides must be uploaded in the separate assignment with Google Slides posted in the Google Classroom by this Friday midnight):
+
+Roll Number: 1 Abin, 5 Atul, 9 Dipesh, 13 Kaushal, 17 Niraj, 21 Pawan, 29 sashwat, 33 Suman
+
+(Generate 200 random data with one continuous dependent variable and five independent variables, random seed = your roll number. 
+Then fit bivariate and multivariate linear regression model, check VIF, BLUE and LINE and 
+predict for the test data (30% sample) 
+compare it with KNN regression, ANN regression and Support Vector Regression using R-square and RMSE of test data and 
+find the best supervised regression model for this data.
+
+Roll Number: 2, 6, 10, 14, 18, 22, 26, 30, 34 
+(Generate 200 random data with one binary/dichotomous dependent variable and two continuous independent variables and three categorical independent variables, random seed = your roll number.
+Then fit bivariate and multivariate logistic regression model, check VIF and BLUE and 
+predict it for test data (20% sample) and also compare it with Naive Bayes, SVM, Decision Tree, Bagging, Random Forest, Tuned Random Forest and Boosting using confusion matrix of test data and
+find the best supervised classification model for this data.
+
+Roll Number: 3, 7, 11, 15, 19, 23, 27, 31, 35 
+(Generate 100 random data with ten continuous independent variables, random seed = your roll number). 
+Then fit PCA, PCA with Varimax rotation, MDS, MDS with Shannon's stress minimization with Bi-plots and interpret them carefully. 
+Compare final PCA with final MDS model graphically.
+ Finally, find the best unsupervised dimension reduction model for this data.
+
+Roll Number: 4, 8, 12, 16, 20, 24, 28, 32 
+(Generate 100 random data with seven continuous independent variables where first independent variable must be the identification variable with name (text), random seed = your roll number. Then fit Hierarchical Cluster Analysis (HCA) with four methods and decide how many clusters (k) must be used for the k-means clustering for each method. 
+Fit k-means clustering for all the methods using the pre-identified k values for each method. 
+Finally, find the best unsupervised clustering model for this data and show it using base r graph and cluster package.
+
+Note: This presentation carries 5 marks out of 12 marks of internal marks available to me so make sure to give your best for it. I will score it for format (1), content (2), presentation (1) and Q&A (1) in the classroom. Another 5 marks will come from homework (assignments/projects) and 2 marks from offline/online class "Discipline".

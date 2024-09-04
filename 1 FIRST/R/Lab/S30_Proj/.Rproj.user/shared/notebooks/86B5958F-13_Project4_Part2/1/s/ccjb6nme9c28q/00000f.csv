@@ -1,0 +1,4 @@
+"0","set.seed(13)"
+"0","index <- sample(2,nrow(crime),replace = T,prob = c(0.7,0.3)) #Random sampling into two independent variable"
+"0","train.crime <- crime[index==1,] #Training set"
+"0","test.crime <- crime[index==2,]  #Test set"

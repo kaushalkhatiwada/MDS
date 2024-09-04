@@ -1,0 +1,2 @@
+"0","train.suplogr <- glm(am ~., data=train.mtcars,family=binomial)"
+"0",""

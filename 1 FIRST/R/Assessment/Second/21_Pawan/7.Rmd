@@ -1,0 +1,55 @@
+---
+title: "R Notebook"
+output:
+  pdf_document: default
+  html_notebook: default
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+# dataset
+aq <- airquality
+head(aq)
+str(aq)
+```
+1
+```{r warning=FALSE}
+1.
+# gof test for temp variable 
+# test normality 
+# using confirmative test : kolmogorov-smirov test for sample size 153
+ks.test(aq$Temp,'pnorm')
+```
+Interpretation:
+we can see that the p-value is less than 0.05 .So we can conclude that the sample is not normal
+
+
+2.
+```{r}
+library(car)
+leveneTest(Temp~factor(Month),data = aq)
+```
+Interpretation:
+Since the categories of months are greater than 2 , we use leveneTest.
+Since , p-value <0.05, we can conclude there is not equal variance between these two variables
+
+3. 
+Since the p-value is less than 0.05 , we need to use post-hoc test. 
+
+4.
+The best independent sample statistical test for the data is TukeyHSD test
+
+```{r}
+TukeyHSD(aov(Temp~factor(Month),data = aq))
+```
+
+Here we can see that month 8 -7 has highest p adj. Also months 18 7-5 ans 8-5 has difference in mean 18.
+
+
+
+
+
+

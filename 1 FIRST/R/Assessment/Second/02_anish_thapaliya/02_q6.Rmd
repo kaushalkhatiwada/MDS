@@ -1,0 +1,45 @@
+---
+title: "02_q6"
+author: "Anish Thapaliya"
+date: "2024-05-31"
+output: html_document
+---
+
+```{r1}
+# Question No 6
+
+library(ggplot2)
+set.seed(33)
+
+age <- sample(10:99, 200, replace = TRUE)
+sex <- sample(c("Male", "Female"), 200, replace = TRUE)
+education <- sample(c("No education", "Primary", "Secondary", "Beyond secondary"), 200, replace = TRUE)
+socioeconomic_status <- sample(c("Low", "Middle", "High"), 200, replace = TRUE)
+bmi <- sample(14:38, 200, replace = TRUE)
+
+
+ggplot(data = data.frame(age, bmi), aes(x = age, y = bmi)) +
+  geom_point() +
+  labs(x = "Age", y = "BMI", title = "Relationship between Age and BMI")
+
+## There seems to be nor trend at all and the data is scattered ## all over
+
+bmi_class <- cut(bmi, breaks = c(0, 18, 24, 30, Inf), labels = c("<18", "18-24", "25-30", "30+"))
+
+# pie chart
+ggplot(data.frame(bmi_class), aes(x = "", fill = bmi_class)) +
+  geom_bar(width = 1) +
+  coord_polar("y", start = 0) +
+   labs(title = "Distribution of BMI Classes") +
+  theme_void() +
+  theme(legend.position = "right")
+
+# here first I cut the bin to 5 classes then using ggplot I #created pie chart.
+# to create pie chart first I created bar then using # #coord_polar(), I created pie
+# chart
+
+ggplot(data.frame(age), aes(x = age)) +
+  geom_histogram(binwidth = 15, fill = "steelblue", color = "white") +
+  labs(x = "Age", y = "Count", title = "Distribution of Age") +
+  theme_classic()
+```

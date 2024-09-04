@@ -1,0 +1,9 @@
+"0","milk_rule1 <- apriori(Groceries, "
+"0","                     parameter = list(supp = 0.001, "
+"0","                                      conf = 0.8),"
+"0","                     appearance = list(default=""rhs""))"
+"1","Apriori
+"
+"1","
+Parameter specification:
+"

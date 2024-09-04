@@ -1,0 +1,3 @@
+"0","library(caret)"
+"0","data.frame(R2 = R2(prediction, test.crime$Murder),"
+"0","           RMSE = RMSE(prediction, test.crime$Murder))"

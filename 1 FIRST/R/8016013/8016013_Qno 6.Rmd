@@ -1,0 +1,72 @@
+---
+title: "MDS503"
+author: '8016013'
+date: "2024-06-27"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Q No 6
+
+## A)
+```{r}
+library(igraph) 
+#a
+#Defining a graph object
+g1<-graph(c("R","S","S","T","T","R","R","T","U","S"))
+```
+
+## B)
+```{r}
+#b
+plot(g1,vertex.color="green",vertex.size=30,edge.color="red",edge.size=5)
+#this graph represent the relation between various nodes
+```
+
+## C)
+```{r}
+#c
+degree(g1)
+#degree states that how many relations a single node is holding then
+#from the result we see that R,S,T have 3 relations but U has only one relation
+```
+we see that R,S,T have 3 relations but U has only one relation
+
+```{r}
+
+closeness(g1)
+#closeness of the nodes is how close the node is with the other nodes
+```
+Clossness of R is higher
+
+```{r}
+betweenness(g1) #it gives how many nodes have the relation with that node 
+#here S has 2 betweenness that means 2 nodes have relation with S
+```
+S has 2 betweenness that means S is in between 2 (R,T) to have relation with U
+
+## D)
+```{r}
+#d
+# Identify hubs in the graph
+hubs <- which(degree(g1) == max(degree(g1)))
+hubs
+```
+Hubs in a graph refer to nodes with high connectivity or degree that serve as central points of the network.
+
+```{r}
+# Find communities in the graph
+communities <- cluster_walktrap(g1)
+cat("Number of communities: ", length(communities), "\n")
+```
+```{r}
+# Visualize the graph with communities highlighted
+plot(communities, g1)
+#Communities in a graph represent groups of nodes that are more densely connected
+#within the group compared to connections between groups
+```

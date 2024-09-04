@@ -1,0 +1,4 @@
+"0","set.seed(13)"
+"0","index <- sample(2,nrow(mtcars),replace = T,prob = c(0.8,0.2)) #Random sampling into two independent c=variable"
+"0","train.mtcars <- mtcars[index==1,] #Training set"
+"0","test.mtcars <- mtcars[index==2,]  #Test set"

@@ -1,0 +1,137 @@
+---
+title: "Project 4 Part II"
+author: "Kaushal Khatiwada"
+date: "2024-05-02"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Part 2
+Using "USArrests" Dataset
+
+## A) Create an “crime” dataset containing all the variables of USArrests
+```{r}
+crime <- USArrests
+```
+
+## B) Create correlation matrix plot of the crime data and interpret each scatterplot carefully
+```{r}
+cor(crime)
+```
+
+visualize correlation matrix
+```{r warning=FALSE}
+library(ggcorrplot)
+library(ggplot2)
+```
+
+```{r}
+ggcorrplot(cor(crime),hc.order = T,lab = T)
+```
+
+```{r}
+plot(crime, pch=20,cex=1,col='steelblue',main="Scatter Plot")
+
+#Relationship between two variable 
+      # -1 inverse linear relationship,
+      # 0 no linear correlation,
+      # 1 linear relationship]
+```
+
+## C) Split the crime dataset into training and testing data with 70% and 30% cases
+```{r}
+set.seed(13)
+index <- sample(2,nrow(crime),replace = T,prob = c(0.7,0.3)) #Random sampling into two independent variable
+train.crime <- crime[index==1,] #Training set
+test.crime <- crime[index==2,]  #Test set
+```
+
+## D) Fit a multiple linear regression on training data with Murder as dependent variable and all other variables as independent variables and interpret the results carefully using R-squared, RMSE, Regression ANOVA and Regression Coefficients (BLUE?)
+
+```{r}
+mlr <- lm(Murder ~ .,data=train.crime)
+summary(mlr)
+```
+
+R-squared = 0.6648
+```{r}
+mean(mlr$residuals^2)   #RMSE= 5.656679
+```
+```{r}
+mlr$coefficients        #Regression Coefficient (Intercept)
+```
+```{r}
+anova(mlr)          #Regression ANOVA
+```
+"Assault" is highly significance, p-value<0.05
+
+## E) Check multicollinearity and finalize this model with the appropriate VIF cut-off value
+```{r warning=FALSE}
+library(car)
+vif(mlr)
+```
+No Multicollinearity beacause VIF of all variable are <10
+
+## F) Perform residual analysis of this model i.e. LINE tests using suggestive graphs and confirmatory tests and interpret the results carefully
+
+##LINE
+## L = Linearity of residuals
+```{r}
+### Suggestive
+plot(mlr,which = 1,col=c("blue")) # LOESS line lies in the zero line so residuals are linear
+```
+```{r}
+### Confirmative
+summary(mlr$residuals)    #Mean = 0 so residuals are linear
+
+```
+
+## I = Independence of residuals
+```{r}
+### Suggestive
+acf(mlr$residuals)        # Show Up and Down so no autocorrelation
+```
+```{r}
+### Confirmative
+library(car)
+durbinWatsonTest(mlr)     # p-value>0.05 no autocorrelation
+```
+
+## N = Normality of residuals
+```{r}
+## Suggestive
+plot(mlr,which = 2,col=c("blue"))
+
+```
+```{r}
+### Confirmative
+shapiro.test(mlr$residuals)   # p-value > 0.05, residuals follow normal distribution
+```
+
+## E = Equal variance of residuals
+```{r}
+### Suggestive
+plot(mlr,which = 3,col=c("blue"))
+```
+```{r warning=FALSE}
+### Confirmative
+library(lmtest)
+bptest(mlr)               # p-value > 0.05, so residual variances are equal (homoscedasticity)
+```
+
+## G) Predict the Murder in the testing dataset using the fitted model
+```{r}
+prediction <- predict(mlr,test.crime)
+prediction
+```
+## H) Report R-square and RMSE of predicted model and interpret them carefully
+```{r}
+library(caret)
+data.frame(R2 = R2(prediction, test.crime$Murder),
+           RMSE = RMSE(prediction, test.crime$Murder))
+```

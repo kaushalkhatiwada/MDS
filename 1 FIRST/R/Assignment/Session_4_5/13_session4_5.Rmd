@@ -1,0 +1,311 @@
+---
+title: "Session 4 and 5"
+author: "Kaushal Khatiwada"
+date: "2024-02-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+## Plotting
+Plot the x and y values.
+```{r}
+x<-c(1:30)
+y<-x^3
+plot(x,y)
+```
+
+## Get and Set working Directory
+
+You can get the working directory with getwd() function and set the working directory with setwd() function.
+
+```{r}
+initial.dir <- getwd()
+setwd("~/R")  
+getwd()
+```
+
+## Load the data from internet and export to local pc
+
+Data set is loaded from internet and exported to local PC with naming column. 
+
+```{r}
+iris <- read.csv(url("https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data"),header = FALSE)
+names(iris)<-c("Sepal.Length","Sepal.Width","Petal.Length","Petal.Width","Species")
+head(iris)
+write.csv(iris,"iris_export.csv")
+```
+
+## Square root of column "Sepal Length" as new column
+
+```{r}
+library(magrittr)
+iris$Sepal.Length.SQRT<-iris$Sepal.Length %>% sqrt()
+head(iris)
+
+```
+
+## Without using seed
+Without using seed it randomly generate new sample every time you run the function.
+```{r}
+rnorm(5)
+
+```
+## Using seed function 
+Using seed function it reproduce same results,even when we generate random number number
+```{r}
+set.seed(123)
+rnorm(5)
+```
+
+Gives Error message because code ends after plot command
+```{r}
+#set.seed(123)
+#rnorm(200)%>%
+#matrix(ncol = 2) %>% 
+#plot %>%
+#colSums
+```
+
+## "tee" pipe 
+It allow to continue command without interruption.
+```{r}
+set.seed(123)
+rnorm(200)%>%
+matrix(ncol = 2) %T>%  
+plot %>%  
+colSums
+```
+
+## Data set Filtering
+Data set is filters to include rows where Sepal length is greater than mean of Sepal length and find the correlation between Sepal length and Sepal width
+```{r}
+iris %>% 
+  subset(Sepal.Length > mean(Sepal.Length)) %$%
+  cor(Sepal.Length,Sepal.Width)
+```
+
+
+## Built-in function
+```{r}
+round(3.1415)
+round(3.1415,digit=2)
+factorial(3)
+mean(1:6)
+```
+
+## Sampling
+By Default the replace value is FALSE which means sample value are not repeated and does not occur more than once.
+When the replace value is TRUE the sample value are repeated and occurs more than once.
+```{r}
+die<-1:6
+sample(x=die,size = 2) #replace value is FALSE by default, sample cannot occur more than once
+sample(x=die,size=2,replace=TRUE) #sample can occur more than once
+```
+
+## Dataset spliting
+Data set is split into training and testing at 70:30 ratio for model training and evaluating.
+```{r}
+iris<- read.csv("iris.csv")
+set.seed(123)
+tt.sample<-sample(c(TRUE,FALSE),nrow(iris),replace=T,prob=c(0.7,0.3))
+train<-iris[tt.sample,]
+test<-iris[!tt.sample,]
+head(train)
+head(test)
+```
+
+
+## Custom function
+Values are defined inside the function
+```{r}
+
+roll<-function(){
+      die<-1:6  #Value defined
+      dice<-sample(die,size=2,replace=TRUE)
+      sum(dice)
+}
+roll()
+```
+Values are passed as a function parameter
+```{r}
+roll2<- function(dice=1:6){
+  dice<-sample(die,size=2,replace=TRUE)
+  sum(dice)
+}
+roll2()
+```
+Values are passed while calling a function as an argument
+
+```{r}
+roll3<- function(dice){
+    dice<-sample(die,size=2,replace=TRUE)
+    sum(dice)
+}
+roll3(dice=1:6)
+roll3(dice=1:12)
+roll3(dice=1:24)
+```
+## Using Ugly method
+```{r}
+best_practice<- c("Let","the","computer","do","the","work")
+print_words<- function(sentences){
+  print(sentences[1])
+  print(sentences[2])
+  print(sentences[3])
+  print(sentences[4])
+  print(sentences[5])
+  print(sentences[6])
+}
+
+print_words(best_practice)
+
+```
+Replace 6th element with NA.
+```{r}
+print_words(best_practice[-6])
+```
+Remove 6th element
+```{r}
+best_practice[-6]
+```
+
+## Using loop
+```{r}
+best_practice<- c("Let","the","computer","do","the","work")
+print_words<- function(sentences){
+  for(word in sentences){
+    print(word)
+  }
+}
+print_words(best_practice)
+```
+
+## Checking value of y with x
+```{r}
+y<-30
+if(y<20){
+  x<- "Too low"
+}else{
+  x<- "Too high"
+}
+x
+```
+## Function to check the value
+```{r}
+check.y<-function(y){
+  if(y<20){
+    print("Too Low")
+  }else{
+    print("Too High")
+  }
+}
+check.y(10)
+check.y(30)
+```
+## Binary variable with ifelse
+If the value to y is less than 20 then "Too low" else its "Too High"
+```{r}
+y<-1:40
+ifelse(y<20,"Too low","Too High")
+
+```
+
+If the value of y is less than 20 then 1 else 0
+```{r}
+y<-1:40
+ifelse(y<20,1,0)
+```
+If the value is less than 20 then "<20" else "20+"
+```{r}
+x<-1:99
+x2.1<-ifelse(x<20,"<20","20+")
+x2.1
+```
+If the value is Between 20 and 40 then "in" else "out"
+```{r}
+x<-1:99
+x2.2<-ifelse(20<=x & x<40,"in","out")
+x2.2
+```
+if the value is Between 40 and 100 then "in" else "out"
+```{r}
+x<-1:99
+x2.3<- ifelse(40<=x & x<100,"in","out")
+x2.3
+```
+
+if the value is less than 20 then 1, if the value is between 20 and 40 then 2, else 3
+```{r}
+x<-1:99
+x3<- ifelse(x<20,1,ifelse(x<40,2,3))
+x3
+```
+
+## Function with nested if..else
+```{r}
+check.x<- function(x=1:99){
+  if(x<20){
+    print("Less than 20")
+  }else{
+    if(x<40){
+    print("20-39")
+    }else{
+      if(x<100){
+      print("41-99")
+      }
+    }
+  }
+}
+check.x(15)
+check.x(30)
+check.x(45)
+```
+
+## Petal Length categories in respect to Petal Length
+within function evaluates the expression and create a copy of Data frame with the result of expression.
+iris frame is evaluated and Petal Length is expressed in small,medium and large category. 
+```{r}
+iris<- within(iris,{
+  Petal.cat<-NA
+  Petal.cat[Petal.Length<1.5] <- "small"
+  Petal.cat[Petal.Length>=1.6 & Petal.Length<5.1] <- "Medium"
+  Petal.cat[Petal.Length<1.5] <- "Large"
+})
+iris$Petal.cat
+table(iris$Petal.cat)
+
+summary(iris$Petal.Length)
+```
+
+## Multiple condition
+```{r}
+temperature<- function(temp){
+if (temp <= 0) {
+  "freezing"
+  } 
+else if(temp <= 10) {
+    "cold"
+  }
+else if (temp <= 20) {
+    "cool"
+  }
+else if (temp <= 30) {
+      "warm"
+    }
+else{
+      "hot"
+    }
+} 
+
+
+temperature(32)
+```

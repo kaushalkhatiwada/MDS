@@ -1,0 +1,7 @@
+"0",""
+"0","plot(varimax_rot$loadings, "
+"0","     col = c(""red"", ""green"", ""blue"")[factor(nci.labs)], "
+"0","     pch = 19,"
+"0","     xlab = ""PC1"", "
+"0","     ylab = ""PC2"", "
+"0","     main = ""Varimax Rotated PCA"")"

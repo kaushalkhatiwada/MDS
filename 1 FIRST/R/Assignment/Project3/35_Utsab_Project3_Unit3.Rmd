@@ -1,0 +1,196 @@
+---
+title: 'Project 3: Unit 3'
+author: "Utsab Bhattarai"
+date: "2024-04-25"
+output: html_document
+---
+
+Loading the built-in dataset called "airquality" into the R environment.
+head(airquality): The head() function is used to display the first few(6) rows of a dataset. In this case, it is displaying the first 6 rows of the "airquality" dataset.
+```{r}
+data(airquality)
+head(airquality)
+```
+
+
+
+It will provide information about the structure of the dataset(airquality), including the names of the variables (columns), their data types and the first few values of each variable.
+```{r}
+str(airquality)
+```
+
+
+
+It calculates the number of bins needed for a histogram by taking the base-2 logarithm of the dataset's length and rounding it up to the nearest integer. Subsequently, it generates breaks for the histogram using these calculated bins, ensuring the spans cover the entire range of temperatures in the dataset. Then, it categorizes the temperature values into intervals based on these breaks, ensuring the lowest interval includes its lower limit. Finally, it constructs a frequency table to tally the occurrences of temperature values falling within each interval. This frequency table offers a summarized view of how temperature values are distributed across different intervals, aiding in understanding the overall pattern of temperature variations in the dataset.
+```{r}
+num_bins <- ceiling(log2(length(airquality$Temp)))
+hist_breaks <- seq(min(airquality$Temp,
+                       na.rm = TRUE),
+                   max(airquality$Temp,
+                       na.rm = TRUE),
+                   length.out = num_bins)
+print(hist_breaks)
+```
+
+
+
+```{r}
+temp_freq <- cut(airquality$Temp,
+                 breaks = hist_breaks,
+                 include.lowest = TRUE)
+freq_table <- table(temp_freq)
+print(freq_table)
+```
+
+
+
+It calculates cumulative frequencies for both less-than and more-than ogives based on the frequency table previously generated. Using these cumulative frequencies, it plots two lines representing the ogives, one for values less than or equal to each bin and another for values greater than or equal to each bin. The intersection point of these two ogives indicates the median value. Additionally, it marks this intersection point on the plot with a green dashed line and provides a legend to differentiate between the two ogives and the intersection point. This plot visually depicts the cumulative distribution of temperature values and helps in understanding the distribution's shape and central tendency.
+```{r}
+less_than_ogive <- cumsum(freq_table)
+more_than_ogive <- rev(cumsum(rev(freq_table)))
+plot(hist_breaks[-1],
+     less_than_ogive,
+     type = "l",
+     col = "blue",
+     xlab = "Temperature",
+     ylab = "Frequency",
+     main = "Ogive Plot",
+     ylim = c(0,150))
+lines(hist_breaks[-1],
+      more_than_ogive,
+      type = "l",
+      col = "red")
+ogive_intersection <- hist_breaks[which(less_than_ogive >= more_than_ogive)[1]]
+abline(v = 81.75,
+       col = "green",
+       lty = 2)
+legend("topright",
+       legend = c("Less Than Ogive", "More Than Ogive", "Intersection"),
+       col = c("blue", "red", "green"),
+       lty = c(1, 1, 2))
+```
+
+
+
+This R code calculates the median of the "Temp" variable in the "airquality" dataset. The argument na.rm = TRUE ensures that any missing values (NA values) are excluded from the calculation. Finally, the cat() function prints the result, displaying the median temperature value to the console.
+```{r}
+median_temp <- median(airquality$Temp, na.rm = TRUE)
+cat("Median of Temp variable:", median_temp, "\n")
+```
+
+
+
+This R code reads a CSV file named "SNA_School.csv" located in the directory "C:\\Users\\user\\OneDrive\\Documents". It then loads the "igraph" library for network analysis, suppressing any warning or message outputs. The data from the CSV file is read into a variable called "data". Subsequently, the columns named "first" and "second" are extracted from the "data" dataframe and stored in a new dataframe called "s". Finally, the first few(6) rows of the "s" dataframe are printed to the console using the `head()` function.
+```{r}
+suppressMessages(
+  suppressWarnings(
+    library(igraph)
+  )
+)
+setwd("C:\\Users\\user\\OneDrive\\Documents")
+data <- read.csv("SNA_School.csv")
+s <- data[, c("first", "second")]
+print(head(s))
+```
+
+
+
+This R code snippet uses the `str()` function to display the structure of the data frame "s". It provides information about the structure of the data frame"s", including the names of the variables (columns) and their data types.
+```{r}
+str(s)
+```
+
+
+
+This R code snippet creates a directed graph object called "net" using the data stored in the data frame "s". The function `graph_from_data_frame()` from the "igraph" library is used to create the graph. The argument `directed = TRUE` specifies that the graph should be directed, meaning that edges have a specified direction.
+```{r}
+net <- graph_from_data_frame(s, directed = TRUE)
+head(net)
+```
+
+
+
+This R code calculates the number of vertices (nodes) in the graph object "net" using the `vcount()` function from the "igraph" library. It stores the result in the variable "num_vertices" and then prints it to the console using the `cat()` function.
+```{r}
+num_vertices <- vcount(net)
+cat("Number of vertices:", num_vertices)
+```
+``The output indicates the total number of vertices present in the graph, providing insight into the size and complexity of the network represented by the graph object.``
+
+
+
+This R code calculates the number of edges in the graph object "net" using the `ecount()` function from the "igraph" library. It stores the result in the variable "num_edges" and then prints it to the console using the `cat()` function.
+```{r}
+num_edges <- ecount(net)
+cat("Number of edges:", num_edges)
+```
+``The output indicates the total number of edges present in the graph, providing insight into the connectivity and structure of the network represented by the graph object.``
+
+
+
+This R code calculates the degree of each vertex (node) in the graph object "net" using the `degree()` function from the "igraph" library. The degree of a vertex is the number of edges incident to it. The result is stored in the variable "degree".
+```{r}
+degree <- degree(net)
+print(head(degree))
+```
+
+
+
+This R code creates a histogram of the degree distribution in the graph object "net" using the `hist()` function. The histogram's main title is set to "Degree Distribution", with the x-axis labeled as "Degree" and the y-axis labeled as "Frequency".
+```{r}
+hist(degree,
+     main = "Degree Distribution",
+     xlab = "Degree",
+     ylab = "Frequency")
+```
+``This visualization helps in understanding the distribution of vertex degrees in the network, providing insights into its structural properties such as connectivity and centrality.``
+
+
+
+This R code generates a plot of the network diagram represented by the graph object "net" using the `plot()` function from the "igraph" library. The resulting plot displays the vertices (nodes) of the network as points and the edges as lines connecting them. The main title of the plot is set to "Network Diagram".
+```{r}
+plot(net,
+     main = "Network Diagram")
+```
+``This visualization provides a visual representation of the network structure, allowing for an intuitive understanding of the relationships and connections between the vertices in the network.``
+
+
+
+This R code creates a plot of the network diagram represented by the graph object "net" using the Kamada-Kawai layout algorithm, specified by the `layout = layout_with_kk` argument in the `plot()` function from the "igraph" library. The resulting plot displays the vertices (nodes) of the network as points and the edges as lines connecting them, arranged according to the Kamada-Kawai layout algorithm. The main title of the plot is set to "Network Diagram (Kamada-Kawai Layout)".
+```{r}
+plot(net,
+     layout = layout_with_kk,
+     main = "Network Diagram (Kamada-Kawai Layout)")
+```
+This layout algorithm aims to position the vertices in a way that minimizes the energy of the graph, providing a visually appealing and informative representation of the network structure.
+
+
+
+This R code calculates hub scores for nodes in a network, where the network is represented by the object `net`. It then identifies nodes with hub scores higher than the mean hub score and prints out their names preceded by "Hubs:". The `hub_score()` function computes the hub scores for each node in the network, and `$vector` extracts the scores. The `names()` function retrieves the names of nodes corresponding to hub scores that exceed the mean hub score.
+```{r}
+hubs <- hub_score(net)$vector
+cat("Hubs:",
+    names(hubs[hubs > mean(hubs)]))
+```
+
+
+
+This R code computes authority scores for nodes in a network represented by the object `net`. It then identifies nodes with authority scores higher than the mean authority score and prints out their names preceded by "Authority:". The `authority_score()` function calculates the authority scores for each node in the network, and `$vector` extracts these scores. The `names()` function retrieves the names of nodes corresponding to authority scores that exceed the mean authority score.
+```{r}
+authority <- authority_score(net)$vector
+cat("Authority:",
+    names(authority[authority > mean(authority)]))
+```
+
+
+
+The plot() function is called to visualize the detected communities on the network. The community object contains the information about the communities detected by the Walktrap algorithm, and net is the network object. The main argument sets the title of the plot to "Community Detection".
+```{r}
+suppressWarnings(
+  community <- walktrap.community(net)
+)
+plot(community,
+     net,
+     main = "Community Detection")
+```
+``This plot helps in understanding the structure of the network by visually identifying clusters or communities of nodes that are more densely connected internally compared to connections between different communities.``

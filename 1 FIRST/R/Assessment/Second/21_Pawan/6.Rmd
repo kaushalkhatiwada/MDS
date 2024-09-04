@@ -1,0 +1,55 @@
+---
+title: "Question 6"
+author: "Pawan Pandey Roll no:21"
+date: "2024-05-31"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+1.
+
+```{r}
+# create a dataset
+set.seed(21)
+age <- sample(10:99,200,replace = TRUE)
+sex <- factor(sample(c(0,1),200,replace = TRUE),levels = c(0,1),labels = c('Male','Female'))
+status <-factor(sample(c(0,1,2),200,replace = TRUE),levels = c(0,1,2),labels = c('Low' , 'Medium','High'))
+bmi <- round(runif(200,min = 14,max = 38),2)
+
+df <- data.frame (age,sex,status,bmi)
+head(df)
+```
+2.
+```{r}
+# create a scatterplot
+
+library(ggplot2)
+ggplot(data = df,mapping = aes(x = age , y= bmi),col = 'blue')+
+   geom_point()
+```
+Interpretation : 
+By oberving the scatterplot , we can see there is no linear relationship between age and bmi . There is no any correlation between them .
+
+
+3.
+```{r}
+#create class
+
+
+```
+
+4.
+```{r}
+# create histogram
+
+ggplot(data = df,mapping = aes(x = age))+
+   geom_histogram(binwidth = 1,bins = 15)
+   
+```
+
