@@ -1,0 +1,32 @@
+R
+
+An Introduction to Statistical Learning: https://www.statlearning.com/
+
+KNN Regression: https://www.youtube.com/watch?v=XClnbOTRQmA (with Bias-Variance tradeoff) 
+ANN Regression: https://www.youtube.com/watch?v=eDcPolK_j8E (time series data)
+Regression Tree: https://www.youtube.com/watch?v=6SMrjEwFiQY (39 minutes for regression)
+SVM Regression: https://www.youtube.com/watch?v=DBApaR2mTg0
+Fitting a neural network in R; neuralnet package and boston dataset of MASS package:  https://www.r-bloggers.com/2015/09/fitting-a-neural-network-in-r-neuralnet-package/
+Forecasting with Neural Networks: 
+	Part A: https://www.youtube.com/watch?v=lGaXq_Kgr2Y
+	Part B: https://www.youtube.com/watch?v=pTJXSVi9IyQ
+	Part C: https://www.youtube.com/watch?v=8nDKLmAfl0M
+
+Use of Raw vs Orthogonal Polynomials:  https://uoepsy.github.io/msmr/2021/msmrlabs/03_nonlin.html
+Modeling Nonlinearity: Polynomial Regression and Splines:  https://www.youtube.com/watch?v=G7Gm3sZbM-4
+Ridge, Lasso & Elastic NetRegression: https://www.youtube.com/watch?v=_3xMSbIde2I&authuser=1
+
+Data Mining: https://aws.amazon.com/what-is/data-mining/
+Text mining: https://rpubs.com/vipero7/introduction-to-text-mining-with-r
+
+SQL and R
+https://www.youtube.com/watch?v=gdzONbwfWk0
+
+Big data
+https://www.youtube.com/watch?v=ybKkdEuxxN8&authuser=1
+https://www.columbia.edu/~sjm2186/EPIC_R/EPIC_R_BigData.pdf
+https://r4ds.had.co.nz/relational-data.html
+https://r4ds.hadley.nz/databases
+
+R for Datascience (Second Edition): https://r4ds.hadley.nz/
+R for Datascience:  https://r4ds.had.co.nz/index.html 

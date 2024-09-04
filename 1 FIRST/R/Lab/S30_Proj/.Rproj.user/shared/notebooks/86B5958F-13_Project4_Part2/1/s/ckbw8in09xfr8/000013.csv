@@ -1,0 +1,2 @@
+"0","### Suggestive"
+"0","plot(mlr,which = 1,col=c(""blue"")) # LOESS line lies in the zero line so residuals are linear"

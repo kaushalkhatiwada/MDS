@@ -1,0 +1,203 @@
+---
+title: "Second Assessment"
+author: "Pratigya Jamakatel"
+date: "2024-05-31"
+output: pdf_document
+---
+
+
+```{r}
+
+
+#Q.no.6Ans:
+# Load necessary libraries
+library(ggplot2)
+
+# Set seed for reproducibility
+set.seed(27)
+
+# Generate random data
+age <- sample(10:99, 200, replace = TRUE)
+age
+sex <- sample(c("male", "female"), 200, replace = TRUE)
+sex
+education <- sample(c("No education", "Primary", "Secondary", "Beyond secondary"), 200, replace = TRUE)
+socio_economic <- sample(c("Low", "Middle", "High"), 200, replace = TRUE)
+bmi <- runif(200, min = 14, max = 38)
+
+#a Create dataset.
+data <- data.frame(age, sex, education, socio_economic, bmi)
+
+# b) Create scatter plot of age and BMI
+scatter_plot <- ggplot(data, aes(x = age, y = bmi)) +
+  geom_point() +
+  labs(title = "Scatter Plot of Age and BMI",
+       x = "Age",
+       y = "BMI") +
+  theme_minimal()
+
+print(scatter_plot)
+
+# c) Create class of BMI variable and pie chart
+# Create BMI class
+data$BMI_class <- cut(data$bmi, breaks = c(0, 18, 24, 30, Inf),
+                      labels = c("<18", "18-24", "25-30", "30+"),
+                      include.lowest = TRUE)
+
+# Create pie chart
+pie_chart <- ggplot(data, aes(x = "", fill = BMI_class)) +
+  geom_bar(width = 1) +
+  coord_polar("y", start = 0) +
+  labs(title = "Pie Chart of BMI Classes") +
+  theme_void() +
+  theme(legend.position = "right")
+
+print(pie_chart)
+
+# d) Create histogram of age variable
+histogram <- ggplot(data, aes(x = age)) +
+  geom_histogram(binwidth = 15, fill = "skyblue", color = "black") +
+  labs(title = "Histogram of Age with Bin Size 15",
+       x = "Age",
+       y = "Frequency") +
+  theme_minimal()
+
+print(histogram)
+#Interpretation:
+#Scatter Plot (age vs BMI): This plot shows the relationship between age and BMI. By observing the scatter plot, you can analyze if there's any correlation between age and BMI. For example, if there's a trend of increasing BMI with age or if there are any outlines.
+
+#Pie Chart (BMI Classes): This chart represents the distribution of BMI classes within the dataset. It gives a visual representation of the proportion of individuals falling into each BMI category. This can be useful for understanding the prevalence of different BMI categories within the population.
+
+#Histogram (Age): The histogram illustrates the distribution of ages within the dataset with a bin size of 15. It helps in understanding the age distribution and identifying any patterns or anomalies, such as whether the distribution is symmetric or skewed, or if there are any prominent peaks.
+
+
+#Q.no.7 Ans: using airquality dataset of R 
+#a)perform goodness-of-fit test on Temp variable to check if it follows normal distribution or not.
+#b)perform goodness-of-fit test on temp variable by month variable to check if the variances of mpg are equal or not on am variable categories.
+#c)Discuss which independent sample test must be used to compare"Temp"variable by "Month" variable categories based on the result obtained above.
+#d)perform the best independent sample statistical test for this data and now interpret result carefully.
+
+
+# Load the airquality dataset
+data(airquality)
+
+# a) Perform goodness-of-fit test on Temp variable to check if it follows normal distribution or not.
+shapiro.test(airquality$Temp)
+
+# b) Perform goodness-of-fit test on Temp variable by Month variable to check if the variances of Temp are equal or not on Month variable categories.
+bartlett.test(Temp ~ Month, data = airquality)
+
+# c) Discuss which independent sample test must be used to compare "Temp" variable by "Month" variable categories based on the result obtained above.
+#the Bartlett test indicates whether the variances across different groups are equal or not, it helps determine whether to use a parametric or non-parametric independent sample test. 
+#If the variances are equal, a parametric test like ANOVA can be used. If not, a non-parametric test like the Kruskal-Wallis test should be used.
+
+# d) Perform the best independent sample statistical test for this data and now interpret the result carefully.
+# Since Bartlett test indicates unequal variances, use the Kruskal-Wallis test.
+kruskal.test(Temp ~ Month, data = airquality)
+
+
+
+
+
+
+#Q.no.10 Ans:
+# Load the iris dataset
+data("iris")
+
+# Take the first four variables (features) of the iris dataset
+iris_features <- iris[, 1:4]
+iris_features
+
+# a) Fit a k-means clustering model in the data with k=2 and k=3
+set.seed(27) # for reproducibility
+kmeans_model_k2 <- kmeans(iris_features, centers = 2)
+kmeans_model_k2
+
+kmeans_model_k3 <- kmeans(iris_features, centers = 3)
+kmeans_model_k3
+
+# b) Plot the clusters formed with k=3 in a single graph and interpret them carefully
+library(cluster)
+clusplot(iris_features, kmeans_model_k3$cluster, color = TRUE, shade = TRUE, labels = 2, lines = 0)
+
+# Interpretation:
+# The clusterplot visualizes the clusters formed by k-means with k=3.
+# Each point represents an observation (flower) colored according to its assigned cluster.
+# The plot provides insights into the separation of clusters based on the first two principal components.
+
+# c) Add cluster centers for the plot of cluster formed with k=3 above and interpret it carefully
+clusplot(iris_features, kmeans_model_k3$cluster, color = TRUE, shade = TRUE, labels = 2, lines = 0, plotchar = FALSE)
+points(kmeans_model_k3$centers, col = 1:3, pch = 8, cex = 2)
+
+# Interpretation:
+# In addition to the previous plot, this plot adds cluster centers represented by large triangles.
+# Each triangle represents the centroid of a cluster.
+# The plot allows for a clearer understanding of the location of the cluster centers relative to the data points.
+
+# d) Compare the k=3 cluster variable with species variable of iris data using confusion matrix and interpret result carefully
+table(iris$Species, kmeans_model_k3$cluster)
+
+# Interpretation:
+# The confusion matrix compares the species variable of the original iris dataset with the clusters formed by k-means with k=3.
+# Each row represents the true species, while each column represents the assigned cluster.
+# The numbers in the cells represent the counts of observations falling into each category.
+# By comparing the clusters with the true species, we can assess how well the clustering algorithm performed in grouping similar species together.
+
+
+#Q.no.7 Ans: using airquality dataset of R 
+
+# Load the airquality dataset
+data(airquality)
+
+# a) Perform goodness-of-fit test on Temp variable to check if it follows normal distribution or not.
+shapiro.test(airquality$Temp)
+
+# b) Perform goodness-of-fit test on Temp variable by Month variable to check if the variances of Temp are equal or not on Month variable categories.
+bartlett.test(Temp ~ Month, data = airquality)
+
+# c) Discuss which independent sample test must be used to compare "Temp" variable by "Month" variable categories based on the result obtained above.
+#the Bartlett test indicates whether the variances across different groups are equal or not, it helps determine whether to use a parametric or non-parametric independent sample test. 
+#If the variances are equal, a parametric test like ANOVA can be used. If not, a non-parametric test like the Kruskal-Wallis test should be used.
+
+# d) Perform the best independent sample statistical test for this data and now interpret the result carefully.
+# Since Bartlett test indicates unequal variances, use the Kruskal-Wallis test.
+kruskal.test(Temp ~ Month, data = airquality)
+
+
+
+
+#Q.no.9 Ans:using iris dataset 
+
+# Load the iris dataset
+data(iris)
+
+# a) Create a "flower scale" of the first four variables of iris dataset using PCA.
+iris_pca <- prcomp(iris[,1:4], scale. = TRUE)
+
+# b) Compute the eigenvalues and interpret the PCA result carefully using Kaiser's criteria.
+eigenvalues <- iris_pca$sdev^2
+kaisers_criteria <- sum(eigenvalues >= 1)
+print(kaisers_criteria)
+
+# c) Show the scree plot and decide on the number of components to retain with careful interpretation.
+screeplot(iris_pca, type = "line", main = "Scree Plot of Iris PCA")
+
+# d) Revise the flower scale with 3 components using VARIMAX rotation and interpret the result carefully.
+library(psych)
+iris_pca_varimax <- principal(iris[,1:4], nfactors = 3, rotate = "varimax")
+print(iris_pca_varimax)
+
+#Interpretation:
+# a)PCA was performed on the first four variables of the iris dataset.
+#b) The eigenvalues represent the amount of variance explained by each principal component. Kaiser's criteria suggest retaining components with eigenvalues greater than or equal to 1. This indicates how many components should be retained.
+
+#c) The scree plot displays the eigenvalues for each principal component. By observing the scree plot, you can determine the "elbow point," where the eigenvalues start to level off. This point helps decide how many components to retain.  the scree plot will assist in deciding whether to retain 2 or 3 components.
+
+#d) VARIMAX rotation is applied to the PCA to improve interpret ability by maximizing the variance of the squared loadings. The rotated PCA provides a clearer interpretation of the components. The result can be interpreted in terms of the loadings of each variable on the components, indicating which variables contribute most to each component and how they are related.
+
+
+#Q.no.8 Ans: Using "Arrests" dataset of car package.
+#a)Divide the Arrests data into the train and test the datasets with 80:20 random splits with 27.
+
+```
+

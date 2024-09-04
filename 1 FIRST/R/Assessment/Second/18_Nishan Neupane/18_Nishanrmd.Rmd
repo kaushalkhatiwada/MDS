@@ -1,0 +1,228 @@
+---
+title: "18_Nishan"
+author: "Nishan Neupane"
+date: "2024-05-31"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+```{r}
+#QN.9
+# Load required libraries
+library(stats)
+library(ggplot2)
+library(ggfortify)
+
+# a)
+city_names <- c("Atlanta", "Chicago", "Denver", "Houston", "Los Angeles", "Miami", 
+                "New York", "San Francisco", "Seattle", "Washington D.C")
+
+city.dissimilarity <- matrix(c(
+  0, 587, 1212, 701, 1936, 604, 748, 2139, 2182, 543,
+  587, 0, 920, 940, 1745, 1188, 713, 1858, 1737, 597,
+  1212, 920, 0, 879, 831, 1726, 1631, 949, 1021, 1494,
+  701, 940, 879, 0, 1374, 968, 1420, 1645, 1891, 1220,
+  1936, 1745, 831, 1374, 0, 2339, 2451, 347, 959, 2300,
+  604, 1188, 1726, 968, 2339, 0, 1092, 2594, 2734, 923,
+  748, 713, 1631, 1420, 2451, 1092, 0, 2571, 2408, 205,
+  2139, 1858, 949, 1645, 347, 2594, 2571, 0, 678, 2442,
+  2182, 1737, 1021, 1891, 959, 2734, 2408, 678, 0, 2329,
+  543, 597, 1494, 1220, 2300, 923, 205, 2442, 2329, 0
+), nrow = 10, byrow = TRUE)
+
+rownames(city.dissimilarity) <- city_names
+colnames(city.dissimilarity) <- city_names
+
+city_dissimilarity <- as.dist(city.dissimilarity)
+#Dissimilarity distance is reduce form of given matrix we will get 9*9 matrix from above 10*10 matrix and it gives same information
+# b) Fit a classical MDS model
+mds_fit <- cmdscale(city.dissimilarity, eig = TRUE, k = 2)
+mds_fit
+#Multidimensional model gives the information about actual location of the city without removing the actual information from the data and its distance
+
+#c. Summary of the model
+mds_coords <- mds_fit$points
+print(mds_coords)
+#d. Create the bi-plot of the MDS model
+#Bi-plot of the model
+plot(mds_coords, type = "n")
+text(mds_coords, labels = city_names, cex = 0.7)
+
+#from the above graph we can see tha position of the data in 2d
+```
+
+```{r}
+# Question No 6
+
+library(ggplot2)
+set.seed(18)
+
+# a
+age <- sample(10:99, 200, replace = TRUE)
+sex <- sample(c("Male", "Female"), 200, replace = TRUE)
+education <- sample(c("No education", "Primary", "Secondary", "Beyond secondary"), 200, replace = TRUE)
+socioeconomic_status <- sample(c("Low", "Middle", "High"), 200, replace = TRUE)
+bmi <- sample(14:38, 200, replace = TRUE)
+#data is injected as per the question
+
+# b
+
+ggplot(data = data.frame(age, bmi), aes(x = age, y = bmi)) +
+  geom_point() +
+  labs(x = "Age", y = "BMI", title = "Relationship between Age and BMI")
+
+# No trend is seen fro the data that means the data is spred all over the graph
+
+# c
+bmi_class <- cut(bmi, breaks = c(0, 18, 24, 30, Inf), labels = c("<18", "18-24", "25-30", "30+"))
+
+#For pie chart
+ggplot(data.frame(bmi_class), aes(x = "", fill = bmi_class)) +
+  geom_bar(width = 1) +
+  coord_polar("y", start = 0) +
+  labs(title = "Distribution of BMI Classes") +
+  theme_void() +
+  theme(legend.position = "right")
+#from the pie chart we can see the maximum part of the data is covered by group 25-30 and 30+ 
+#and minimum part of the data is from <18 
+
+# d
+
+ggplot(data.frame(age), aes(x = age)) +
+  geom_histogram(binwidth = 15, fill = "steelblue", color = "white") +
+  labs(x = "Age", y = "Count", title = "Distribution of Age") +
+  theme_classic()
+#From above plot we can see thet all the data has simmilar frequency except highest one
+
+
+
+
+```
+
+```{r}
+#8
+library(car)
+library(e1071)
+# a
+data <- Arrests
+ind <- sample(2, nrow(data), 
+              replace = T, prob = c(0.8, 0.2))
+train <- data[ind==1,]
+test <- data[ind==2,]
+#data is divided in 80-20 portion
+
+# b
+
+# For the logistic regression model
+logistic_model <- glm(released ~ ., data = train, family = "binomial")
+
+# For the Naive Bayes model
+nb_model <- naiveBayes(released ~ ., data = train)
+
+# c
+# to get  predictions.
+logistic_pred <- predict(logistic_model, newdata = test, type = "response")
+nb_pred <- predict(nb_model, newdata = test)
+
+
+logistic_pred_class <- ifelse(logistic_pred > 0.5, 1, 0)
+logistic_conf_matrix <- table(Predicted = logistic_pred_class, Actual = test$released)
+logistic_conf_matrix
+logistic_accuracy <- sum(diag(logistic_conf_matrix)) / sum(logistic_conf_matrix)
+print(paste("Logistic Regression Accuracy:", logistic_accuracy))
+
+# True Negatives (TN): 9
+# in this case actual result is no and our model predect no
+# False Negatives (FN): 3
+# in this case actual result is yes and our model predect no
+# False Positives (FP): 176
+# in this case actual result is yes and our model predect no.
+# True Positives (TP): 837
+# in this case actual result is yes and our model predect yes
+#it has 83% accuracy
+
+nb_conf_matrix <- table(Predicted = nb_pred, Actual = test$release)
+nb_conf_matrix
+nb_accuracy <- sum(diag(nb_conf_matrix)) / sum(nb_conf_matrix)
+print(paste("Naive Bayes Accuracy:", nb_accuracy))
+
+# True Negatives (TN): 27
+# in this case actual result is no and our model predect no
+# False Negatives (FN): 32
+# in this case actual result is yes and our model predect no
+# False Positives (FP): 158
+# in this case actual result is yes and our model predect no.
+# True Positives (TP): 808
+# in this case actual result is yes and our model predect yes
+# accuracy of the naive bayes is 81%
+# d
+# from their accuracy we can say that logistic regression is best because it gives 83% accuracy
+
+
+```
+
+```{r}
+
+# QN 7
+library(dplyr)
+data <- airquality
+data$Month <- as.factor(data$Month)
+
+#a.
+
+# For checking sample size per month
+per_month_count <- data %>% group_by(Month) %>% summarize(count = n())
+per_month_count
+
+#Shapiro-Wilk test is performed for normality within each month
+result <- tapply(data$Temp, data$Month, shapiro.test)
+print(result)
+
+# it is in normal distribution because p value is greater than 0.07
+
+#b.
+
+airquality$Month <- factor(airquality$Month)
+bartlett_result <- bartlett.test(Temp ~ Month, data = airquality)
+print(bartlett_result)
+#since the p value is less than 0.05 this shows that they donot have equal variance
+
+
+#c. 
+#we need to use Bartlett’s test in the above case suggests that the “Temp” variable’s variances
+#one-way ANOVA is appropriate.
+
+#d.
+data("airquality")
+anova_model <- aov(Temp ~ Month, data = airquality)
+summary(anova_model)
+airquality$Month <- factor(airquality$Month)
+anova_model <- aov(Temp ~ Month, data = airquality)
+tukey_result <- TukeyHSD(anova_model)
+print(tukey_result)
+# here we can see relationship between temp and month of (6-5),(7-5),(8-5),(9-5) are less significant
+#as compared to month of (9-6),(8-7).
+
+
+
+```

@@ -1,0 +1,265 @@
+---
+title: "Project 3"
+author: "Kaushal Khatiwada"
+date: "2024-04-28"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## WORK 1 
+## Locate Median of “Temp” variable graphically
+
+ Find the interval size and class interval using sturge's formula.
+```{r}
+aq_temp <- airquality$Temp
+High <- max(aq_temp)  # max value is 97
+Low <- min(aq_temp)  # min value is 56
+N = length(aq_temp)  # number of observation is 153
+
+# Calculate number of class intervals Using Sturges' formula
+class_intervals <-  ceiling(log2(N) + 1) # 9 class intervals
+breaks <- seq(Low,High,length.out = class_intervals)
+
+#Frequency
+f <- table(cut(aq_temp,breaks = breaks,include.lowest = TRUE))
+f
+```
+Get frequency for less than ogive
+```{r}
+less_than_ogive <- cumsum(f)
+less_than_ogive
+```
+
+Get frequency for more than ogive
+```{r}
+more_than_ogive <- rev(cumsum(rev(f)))
+more_than_ogive
+```
+
+Plot less than and more than ogives 
+```{r}
+plot(breaks[-1],
+     less_than_ogive, 
+     type = "o",
+     col = "blue",
+     xlab = "Temperature",
+     xlim = c(50,100),
+     ylim = c(0,150),
+     ylab = "Cumulative Frequency", 
+     main = "Ogive for Temperature")
+points(breaks[-1], 
+       more_than_ogive, 
+       type = "o", 
+       col = "red",
+       ylim = c(0,150),
+       xlim = c(55,100))
+
+legend("topright", legend = c("Less than Ogive", "More than Ogive"), col = c("blue", "red"),
+       lty = c(1, 1),lwd = 2,cex = 0.6)
+```
+
+Draw a line from the intersection breaks (intersection_lower, intersection_upper)
+```{r}
+intersection_lower <- breaks[which(less_than_ogive >= more_than_ogive)[1]]
+intersection_upper <- breaks[which(less_than_ogive >= more_than_ogive)[1]+1]
+intersection_lower
+intersection_upper
+
+```
+
+```{r}
+#Intersection line
+
+```
+Find the median in R
+```{r}
+median <- median(aq_temp)
+cat("Median is ",median)
+```
+
+## WORK 2
+## Locate Mode of “Temp” variable graphically
+Histogram of Temp variable in airquality dataset
+```{r}
+aq_temp <- airquality$Temp
+hist(aq_temp, main = "Temperature",col="white",xlab = "Temperature")
+h <- hist(aq_temp,plot=F)
+```
+Get the tallest bar, left bar and right bar
+```{r}
+highest_freq <- max(h$counts)       #34
+highest_freq
+```
+```{r}
+highest_bar <- which.max(h$counts)  # 6th bar
+highest_bar
+```
+```{r}
+left_bar <- highest_bar - 1         # 5th bar
+left_bar
+```
+```{r}
+right_bar <- highest_bar + 1        # 7th bar
+right_bar
+```
+
+Draw a diagonal line from upper bound of largest bar  to upper bound of left bar at top of the bar
+```{r}
+
+left_upper <- h$breaks[left_bar + 1]
+left_bar_count <- h$counts[left_bar]
+
+highest_bar_upper <- h$breaks[highest_bar + 1]
+highest_bar_count <- h$counts[highest_bar]
+hist(aq_temp, main = "Temperature",col="white",xlab = "Temperature")
+segments(left_upper, left_bar_count, highest_bar_upper, highest_bar_count, col = "darkgreen")
+```
+
+Draw a diagonal line from lower bound of largest bar  to lower bound of right bar at top of the bar
+```{r}
+right_lower <- h$breaks[highest_bar] 
+right_bar_count <- h$counts[right_bar]
+
+highest_bar_lower <- h$breaks[right_bar] 
+highest_bar_count <- h$counts[highest_bar]
+
+hist(aq_temp, main = "Temperature",col="white",xlab = "Temperature")
+segments(left_upper, left_bar_count, highest_bar_upper, highest_bar_count, col = "darkgreen")
+segments(right_lower, highest_bar_count, highest_bar_lower, right_bar_count, col = "blue")
+```
+Find the intersction point using point of intersection formula
+```{r}
+# Calculate slopes (m) and y-intercepts (b) of the two lines
+slope1 <- (highest_bar_count - left_bar_count) / (highest_bar_upper - left_upper)
+slope2 <- (right_bar_count - highest_bar_count) / (highest_bar_lower - right_lower)
+
+intercept1 <- left_bar_count - slope1 * left_upper
+intercept2 <- highest_bar_count - slope2 * right_lower
+
+cat("Slope of grren line",slope1)
+cat("\nSlope of blue line",slope2)
+cat("\nIntercept of green line",intercept1)
+cat("\nIntercept of blue line",intercept2)
+```
+
+Using point of intersection formula
+```{r}
+intersection_x <- (intercept2 - intercept1) / (slope1 - slope2) 
+cat("Temperature value at intesection point is ",intersection_x)  # 80.33333
+```
+So the mode is 80.333 (approx 81)
+
+Draw a line
+```{r}
+hist(aq_temp, main = "Temperature",col="white",xlab = "Temperature")
+segments(left_upper, left_bar_count, highest_bar_upper, highest_bar_count, col = "darkgreen")
+segments(right_lower, highest_bar_count, highest_bar_lower, right_bar_count, col = "blue")
+abline(v = intersection_x, col = "red", lty = 2)
+```
+Mode Using R
+```{r}
+f <- table(aq_temp)
+max_freq <- max(f)
+mode <- names(f)[f == max_freq]
+cat("Mode is", mode)
+```
+
+## WORK 3
+## Perform social network analysis of first and second variables
+```{r}
+
+library(igraph)
+```
+
+Get first and column column
+```{r}
+sna <- read.csv("Kaushal Khatiwada - SNA_School.csv")
+s <- sna[, 1:2]
+```
+
+```{r}
+net <- graph_from_data_frame(s, directed = T)
+```
+
+Number of vertices
+```{r}
+V(net)   # 52 vertices
+```
+Number of edges
+```{r}
+E(net)   # 290 Edges
+```
+Degree of each vertices
+```{r}
+degree(net)
+```
+Hisotgram 
+```{r}
+degree_table <- table(degree(net))
+set.seed(13)
+hist(degree(net),
+     main = "Degree",
+     xlab = "Degree",
+     ylab = "Frequency",
+     col= "red")
+```
+
+Network Diagram
+```{r}
+plot(net,
+     vertex.color = "green",
+     edge.arrow.size = 0.1,
+     vertex.label.cex = 0.8)
+```
+Network Diagram using Kamada-kawai layout
+```{r}
+plot(net,
+     layout = layout.kamada.kawai,
+     main = "Network Diagram (Kamada-Kawai Layout)",
+     vertex.color = rainbow(13),
+     edge.arrow.size = 0.1,
+     vertex.label.cex = 0.8)
+```
+
+
+Hubs is a node with most outer edges
+```{r}
+hubs <- hub_score(net)$vector
+plot(net,
+     main = "Hubs",
+     vertex.color = rainbow(13),
+     vertex.size = hubs * 30,
+     edge.arrow.size = 0.1
+     )
+
+```
+CC and CB are hubs
+
+Authorities is a node with most inner edges
+```{r}
+authorities <- authority_score(net)$vector
+plot(net,
+     main = "Authority",
+     vertex.color = rainbow(13),
+     vertex.size = authorities * 30,
+     edge.arrow.size = 0.1,
+     vertex.label.cex = 0.8)
+```
+CA is authority
+
+
+Community is form with densely connected noede
+```{r}
+net <- graph_from_data_frame(s, directed = F)
+community_cluster <- cluster_edge_betweenness(net)
+plot(community_cluster,
+     net,
+     vetex.size = 10,
+     vertex.label.cex = 0.8
+)
+```

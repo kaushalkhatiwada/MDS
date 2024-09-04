@@ -1,0 +1,69 @@
+# Load necessary packages
+library(factoextra)
+library(ggplot2)
+
+# Generate random data
+set.seed(7)
+n_samples <- 100
+n_features <- 10
+data <- data.frame(matrix(runif(n_samples * n_features), nrow = n_samples, ncol = n_features))
+names(data) <- paste0("Var", 1:n_features)
+
+# Standardize the data
+data_standardized <- scale(data)
+
+# Perform PCA: generating composite score
+pca_model <- prcomp(data_standardized, center = TRUE, scale. = TRUE)
+
+# Calculate and plot cumulative variance explained by each PC
+fviz_eig(pca_model, addlabels = TRUE) +
+  ggtitle("Cumulative Variance Explained by Each PC")
+
+# Check the summary to see how much variance each PC explains
+summary(pca_model)
+
+# Calculate total variance explained by each principal component
+var_explained = pca_model$sdev^2 / sum(pca_model$sdev^2)
+
+# creating scree plot
+qplot(c(1:10), var_explained) + 
+  geom_line() +
+  xlab("Principal Component") +
+  ylab("Variance Explained") +
+  ggtitle("Scree Plot") +
+  ylim(0, 1)
+
+# first seven variable have the cumulative proportion of 81%, so first seven variables would be sufficient to represent the data set
+
+# Rotated PCA with variance maximization
+fa.2 <-psych::principal(data_standardized, nfactors = 10, rotate = "varimax")
+summary(fa.2)
+
+# Bi-plots
+biplot(fa.2, labels = rownames(data_standardized))
+
+# Classical Multi-dimensional scaling (MDS) using Kruskall’s stress, Distance calculation
+
+state.disimilarity <- dist(data_standardized)
+mds.1 <- cmdscale(state.disimilarity)
+summary(mds.1)
+
+plot(mds.1, pch=19)
+abline(h=0, lty=2)
+text(mds.1, pos = 4, labels = rownames(data_standardized), col = 'steelblue')
+
+mds.2 <- MASS::sammon(state.disimilarity, trace = FALSE)
+summary(mds.2)
+
+plot(mds.2$points, pch = 19)
+abline(h=0, v=0, lty=2)
+
+text(mds.2$points, pos = 4, labels = rownames(data_standardized), col = 'steelblue')
+
+# Compare with PCA (first two PCs):
+
+arrows(x0 = mds.2$points[,1], y0 = mds.2$points[,2],
+       x1 = pca_model$x[,1], y1 = pca_model$x[,2],
+       col = 'red', pch = 19, cex = 0.5)
+
+

@@ -1,0 +1,2 @@
+"0","sorted_rules <- sort(apriori_rule, by = ""confidence"", decreasing = TRUE)"
+"0","inspect(sorted_rules[1:5])"

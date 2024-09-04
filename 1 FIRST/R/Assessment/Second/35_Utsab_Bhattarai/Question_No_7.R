@@ -1,0 +1,31 @@
+# Do the followings in R studio using "airquality" data set of R script to knit PDF output:
+data("airquality")
+## a. Perform goodness-of-fit test on Temp variable to check it it follows normal distribution or not.
+library(stats)
+shapiro_test <- shapiro.test(airquality$Temp)
+shapiro_test
+
+# Interpretation:
+# The Shapiro-Wilk test for normality checks if the Temp variable follows a normal distribution.
+# Here, the p-value (0.009319) is less than 0.05, thus we reject the null hypothesis that the data follows a normal distribution.
+
+## b. Perform goodness-of-fit test on Temp variable by Month variable to check if the variances of mpg are equal or not on am variable categories.
+bartlett_test <- bartlett.test(Temp ~ factor(Month), data = airquality)
+bartlett_test
+
+# Interpretation:
+# Bartlett Test checks if the variances of Temp are equal across the different months.
+# Here, the p-value (0.01718) is less than 0.05, we reject the null hypothesis that the variances are equal.
+
+## c. Discuss which independent sample must be used to compare "Temp" variable by "Month" variable categories based on the results obtained above.
+# As the Temp data follows a normal distribution and the variances are equal, we use ANOVA.
+
+## d. Perform the best independent sample statistical test for this data now and interpret the results carefully.
+# Perform the appropriate test based on normality and homogeneity of variances
+shapiro_test$p.value > 0.05 && bartlett_test$p.value > 0.05
+anova_test <- aov(Temp ~ factor(Month), data = airquality)
+summary(anova_test)
+  
+# Interpretation:
+# ANOVA checks if there are any statistically significant differences in the means of Temp across the different months.
+# Here, the p-value is less than 0.05, we reject the null hypothesis that the means are equal.

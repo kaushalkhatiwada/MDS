@@ -1,0 +1,141 @@
+---
+title: "Second Assessment"
+author: "20_Nishchal_Danuwar"
+date: "2024-05-31"
+output:
+  html_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Qestion number: 7
+Loading necessary packages to work with air-quality dataset of R.
+```{r, warning = FALSE}
+library(dplyr)   # For data manipulation
+library(tidyr)   # For data reshaping
+library(ggplot2) # For visualization
+library(broom)   # For tidy model outputs
+```
+
+a) Performing goodness-of-fit test on Temp variable to check if it follows normal distribution or not. 
+Loading **airquality** data:
+```{r}
+data("airquality")
+str(airquality)
+head(airquality)
+```
+
+Now performing **goodness-of-fit** test on **Temp** variable using Shapiro-Wilk test for normality:
+```{r}
+shapiro_test <- airquality %>%
+  summarise(p_value = shapiro.test(Temp)$p.value)
+
+# Display the test results
+shapiro_test
+```
+With p-value 0.009319356 which is less than 0.05, Temp variable may not follow
+normal distribution.
+
+b) Performing goodness-of-fit on Temp variable by Month variable to check if the variances of mpg are equal or not on am variable categories.
+```{r}
+# Shapiro-Wilk test for normality by Month
+shapiro_test <- airquality %>%
+  group_by(Month) %>%
+  summarise(p_value = shapiro.test(Temp)$p.value)
+
+# Display the test results
+shapiro_test
+```
+With p-values greater than 0.05, it may follow normal distribution on certain months.
+```{r}
+# Fit one-way ANOVA to compare Temp by Month
+anova_result <- aov(Temp ~ Month, data = airquality)
+
+# Summarize ANOVA results
+summary(anova_result)
+```
+
+## Question number: 8
+Loading the **USArrests** dataset and creating new dataset to work with:
+```{r}
+data("USArrests")
+
+# Create a new dataset "crime" containing all variables from USArrests
+crime <- USArrests
+
+# Print the structure of the new dataset
+str(crime)
+
+# Print the first few rows of the new dataset
+head(crime)
+```
+
+a) Randomly splitting the dataset into training and testing dataset
+```{r}
+set.seed(20)
+index <- sample(2, nrow(crime), replace = T, prob = c(0.8, 0.2))
+train.crime = crime[index == 1, ] # Training dataset
+test.crime = crime[index == 2, ] # Testing dataset
+```
+
+Displaying sample data:
+```{r}
+head(train.crime)
+```
+
+
+
+ 
+Repeating the process for other methods (complete, average, ward)
+
+Fitting Hierarchical Cluster Analysis for other methods
+```{r}
+hc_complete <- hclust(dist(data[, -1]), method = "complete")
+hc_average <- hclust(dist(data[, -1]), method = "average")
+hc_ward <- hclust(dist(data[, -1]), method = "ward.D2")
+```
+
+Deciding the number of clusters for **k-means** for other methods
+```{r}
+k_complete <- cutree(hc_complete, k = 4)
+k_average <- cutree(hc_average, k = 4)
+k_ward <- cutree(hc_ward, k = 4)
+```
+
+Fitting **k-means** clustering for other methods
+```{r}
+km_complete <- kmeans(data[, -1], centers = initial_centers, nstart = 25, algorithm = "Hartigan-Wong")
+km_average <- kmeans(data[, -1], centers = initial_centers, nstart = 25, algorithm = "Hartigan-Wong")
+km_ward <- kmeans(data[, -1], centers = initial_centers, nstart = 25, algorithm = "Hartigan-Wong")
+```
+
+Visualizing the clustering by using **base R graph** and **cluster package** for other methods
+Complete Method
+```{r}
+plot(hc_complete, main = "Complete Linkage", xlab = "", sub = "", cex = 0.6)
+rect.hclust(hc_complete, k = 4, border = 2:5)
+clusplot(data[, -1], km_complete$cluster, main = "Complete Linkage - k-means", color = TRUE, shade = TRUE)
+```
+Average Method
+```{r}
+plot(hc_average, main = "Average Linkage", xlab = "", sub = "", cex = 0.6)
+rect.hclust(hc_average, k = 4, border = 2:5)
+clusplot(data[, -1], km_average$cluster, main = "Average Linkage - k-means", 
+         color = TRUE, shade = TRUE)
+```
+Ward Method
+```{r}
+plot(hc_ward, main = "Ward Linkage", xlab = "", sub = "", cex = 0.6)
+rect.hclust(hc_ward, k = 4, border = 2:5)
+clusplot(data[, -1], km_ward$cluster, main = "Ward Linkage - k-means", 
+         color = TRUE, shade = TRUE)
+```
+
+
+
+
+```
+

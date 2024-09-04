@@ -1,0 +1,51 @@
+---
+title: '10'
+author: "Pawan Pandey Roll no:21"
+date: "2024-05-31"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+# Data set
+iris <- iris[,c(1,2,3,4)]
+head(iris)
+```
+
+
+```{r warning=FALSE}
+#library
+library(ClusterR)
+library(cluster)
+```
+1.
+```{r}
+set.seed(21)
+kmeans2 <- kmeans(iris,centers =2 , nstart = 20)
+kmeans2
+```
+```{r}
+set.seed(21)
+kmeans3 <- kmeans(iris,centers =3 , nstart = 20)
+kmeans3
+```
+```{r}
+plot(iris,col=(kmeans3$cluster+1),main="k=3",pch=20,cex=2)
+```
+Interpretation:
+we can see the different clustered plots for different variables 
+like one cluster green cluster is very away from the others that means if the length and width of petel and sepel is small they have more sepel width.
+
+
+3.
+```{r}
+
+```
+
+

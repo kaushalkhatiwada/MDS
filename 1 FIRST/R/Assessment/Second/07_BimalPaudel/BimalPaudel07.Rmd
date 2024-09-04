@@ -1,0 +1,115 @@
+---
+title: "BimalPaudel07"
+author: "Bimal Paudel"
+date: "2024-05-31"
+output: pdf_document
+---
+
+Question No. 6
+
+```{r}
+set.seed(7)
+n_samples <- 200
+age <- c(10:99)
+sex <- c('male', 'female')
+education_level <- c('No education','Primary', 'Secondary', 'Beyond Secondary')
+socio_economic_stataus <- c('Low', 'Middle', 'High')
+body_mass_index <- c(14:38)
+```
+
+Question No. 7
+
+```{r}
+data(airquality)
+
+shapiro.test(airquality$Temp)
+
+# p-value = 0.009319 < 0.05, hence it does not follow the normal distribution
+
+data <- airquality[, c("Temp", "Month")]
+row_names <- row.names(data)
+
+# Step 2: Standardize the data
+data_standardized <- scale(data)
+
+# Step 3: Assign row names back to the standardized data
+rownames(data_standardized) <- row_names
+
+classical_state_disimilarity <- dist(data_standardized)
+classical_mds <- cmdscale(classical_state_disimilarity)
+summary(classical_mds)
+
+# Perform Shapiro-Wilk test for each month separately
+months <- unique(airquality$Month)
+
+for (month in months) {
+  temp_values <- airquality$Temp[airquality$Month == month]
+  result <- shapiro.test(temp_values)
+  cat("Shapiro-Wilk Test for Temp in Month", month, ":\n")
+  print(result)
+  cat("\n")
+}
+
+library(dplyr)
+library(purrr)
+
+# Group data by 'Month' and perform Shapiro-Wilk test on 'Temp'
+results <- airquality %>%
+  group_by(Month) %>%
+  summarise(test_result = list(shapiro.test(Temp)))
+
+# Print the results
+results %>%
+  mutate(p_value = map_dbl(test_result, "p.value")) %>%
+  select(-test_result)
+
+# Interpretation: P-value for each month is above 0.005 hence we can conclude that the data are normally distributed
+
+```
+
+
+Question No. 8
+
+```{r}
+library(car)
+data(Arrests)
+
+a.sample <- sample(c(TRUE, FALSE), nrow(Arrests), replace=T, prob=c(0.8,0.2))
+train <- Arrests[a.sample, ]
+test <- Arrests[!a.sample, ]
+
+```
+
+Question No. 9
+
+```{r}
+library(ggplot2)
+library(factoextra)
+
+data(iris)
+
+data <- data.frame(Sepal.Length = iris$Sepal.Length, Sepal.Width = iris$Sepal.Width, Petal.Length = iris$Petal.Length, Petal.WIdth = iris$Petal.Width)
+
+row_names <- row.names(data)
+
+# Step 2: Standardize the data
+data_standardized <- scale(data)
+
+# Step 3: Assign row names back to the standardized data
+rownames(data_standardized) <- row_names
+
+# Perform PCA: generating composite score
+pca_model <- prcomp(data_standardized, center = TRUE, scale. = TRUE)
+
+# Calculate and plot cumulative variance explained by each PC
+fviz_eig(pca_model, addlabels = TRUE) +
+  ggtitle("Cumulative Variance Explained by Each PC")
+
+# Check the summary to see how much variance each PC explains
+summary(pca_model)
+
+# Calculate total variance explained by each principal component
+var_explained = pca_model$sdev^2 / sum(pca_model$sdev^2)
+
+```
+

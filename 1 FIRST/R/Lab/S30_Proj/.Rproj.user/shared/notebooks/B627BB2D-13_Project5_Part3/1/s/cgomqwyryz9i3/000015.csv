@@ -1,0 +1,2 @@
+"0","plot(hclust(data.dist,method = ""single""), xlab = """", sub = """", ylab = """","
+"0","     labels = nci.labs, main = ""Single Linkage"")"

@@ -1,0 +1,98 @@
+---
+title: "Project 5 Part 1"
+author: "Kaushal Khatiwada"
+date: "2024-05-13"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Use NCI60 data of ISLR2 package
+```{r}
+library(ISLR2)
+```
+
+## A) Define nci labels (NCI$labs) as nci.labs and nci data (NCI$data) and nic.data
+```{r}
+nci.labs <- NCI60$labs
+nci.data <- NCI60$data
+```
+
+## B) Check dimension of nci.data object and interpret it carefully
+```{r}
+dim(nci.data)   # 64 rows 6830 columns
+```
+
+## C) Check first four cancer types using nci.labs object
+```{r}
+head(nci.labs,4)
+```
+
+## D) Fit principal component analysis (PCA) on nci.data with scale = TRUE argument as pr.out object
+```{r}
+pr.out <- prcomp(nci.data,scale=T)
+```
+
+## E) Create a plot showing first three PCA components with three different colors
+```{r}
+plot(pr.out$x[, 1:3], 
+     col = c("red", "green", "blue")[factor(nci.labs)],
+     pch = 19, 
+     xlab = "PC1", 
+     ylab = "PC2")
+```
+
+## F) Get summary of pr.out object and interpret it carefully
+```{r}
+summary(pr.out)
+```
+
+## G Plot pro.out object and interpret it carefully
+```{r}
+plot(pr.out)
+```
+
+## H) Create custom scatterplots with principal components in x-axis and proportion variance explained (PVE) in y-axis for the first plot and cumulative PVE in the y-axis for the second plot and interpret them carefully
+```{r}
+par(mfrow = c(1, 2))
+var_expalined <- pr.out$sdev^2 / sum(pr.out$sdev^2)
+plot(var_expalined, 
+     xlab = "Principal Components", 
+     ylab = "PVE",
+     col="red")
+plot(cumsum(var_expalined), 
+     xlab = "Principal Components", 
+     ylab = "Cumulative PVE",
+     col="blue")
+```
+
+## I) Perform PCA with varimax rotation and compare it with the PCA result obtained above
+```{r}
+library(FactoMineR)
+pca.1 <- PCA(nci.data, scale = TRUE, ncp = 3, graph = FALSE)
+varimax_rot <- varimax(pca.1$ind$coord[, 1:3])
+```
+
+## Compare with the PCA result obtained above
+```{r}
+par(mfrow = c(1, 2))
+plot(pr.out$x[, 1:3], 
+     col = c("red", "green", "blue")[factor(nci.labs)], 
+     pch = 19, xlab = "PC1",
+     ylab = "PC2", 
+     main = "Original PCA")
+
+plot(varimax_rot$loadings, 
+     col = c("red", "green", "blue")[factor(nci.labs)], 
+     pch = 19,
+     xlab = "PC1", 
+     ylab = "PC2", 
+     main = "Varimax Rotated PCA")
+```
+
+## J) Write summary of the results and conclusion based on your findings
+

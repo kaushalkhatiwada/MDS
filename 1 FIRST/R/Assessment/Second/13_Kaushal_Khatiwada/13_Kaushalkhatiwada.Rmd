@@ -1,0 +1,214 @@
+---
+title: 'ROLL NO: 13'
+author: "Kaushal Khatiwada"
+date: "2024-05-31"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+## Q no 6
+```{r}
+library(ggplot2)
+```
+
+
+## A)
+```{r}
+set.seed(13)
+age <- sample(10:99, 200, replace = TRUE)
+sex <- sample(c("Male", "Female"), 200, replace = TRUE)
+education <- sample(c("No education", "Primary", "Secondary", "Beyond secondary"), 200, replace = TRUE)
+socioeconomic_status <- sample(c("Low", "Middle", "High"), 200, replace = TRUE)
+bmi <- sample(14:38, 200, replace = TRUE)
+```
+
+## B)
+```{r}
+ggplot(data = data.frame(age, bmi), aes(x = age, y = bmi)) +
+  geom_point() +
+  labs(x = "Age", y = "BMI", title = "Relationship between Age and BMI")
+```
+No trend is seen from the data that means the data is well spread
+
+## C)
+```{r}
+bmi_class <- cut(bmi, breaks = c(0, 18, 24, 30, Inf), labels = c("<18", "18-24", "25-30", "30+"))
+
+ggplot(data.frame(bmi_class), aes(x = "", fill = bmi_class)) +
+  geom_bar(width = 1) +
+  coord_polar("y", start = 0) +
+  labs(title = "Distribution of BMI Classes") +
+  theme_void() +
+  theme(legend.position = "right")
+```
+From the pie chart we can see the maximum part of the data is covered by group 25-30 and 30+ and minimum part of the data is from <18 
+
+## D)
+```{r}
+ggplot(data.frame(age), aes(x = age)) +
+  geom_histogram(binwidth = 15, fill = "steelblue", color = "white") +
+  labs(x = "Age", y = "Count", title = "Distribution of Age") +
+  theme_classic()
+```
+From above plot we can see thet all the data has simmilar frequency except highest one
+
+
+## Q no 7
+```{r}
+library(dplyr)
+data <- airquality
+data$Month <- as.factor(data$Month)
+```
+
+## A)
+```{r}
+# Check sample size per month
+per_month_count <- data %>% group_by(Month) %>% summarize(count = n())
+per_month_count
+
+```
+## Perform Shapiro-Wilk test for normality within each month
+```{r}
+result <- tapply(data$Temp, data$Month, shapiro.test)
+print(result)
+```
+The data follows a normal distribution within each month as p value is greater than 0.05.
+
+## B)
+```{r}
+airquality$Month <- factor(airquality$Month)
+bartlett_result <- bartlett.test(Temp ~ Month, data = airquality)
+print(bartlett_result)
+```
+
+## c) 
+
+Bartlett’s test in the above case suggests that the “Temp” variable’s variances are roughly equal between months. Consequently, the conventional one-way ANOVA is appropriate.
+
+## D) perform the best independent sample statistical test for this data now and interpret the result carefully.
+```{r}
+data("airquality")
+anova_model <- aov(Temp ~ Month, data = airquality)
+summary(anova_model)
+```
+```{r}
+airquality$Month <- factor(airquality$Month)
+anova_model <- aov(Temp ~ Month, data = airquality)
+tukey_result <- TukeyHSD(anova_model)
+print(tukey_result)
+```
+
+## Here we can see relationship between temp and month of (6-5),(7-5),(8-5),(9-5) are less significant as compared to month of (9-6),(8-7).
+
+
+## Q no 8
+```{r}
+library(car)
+arrest <- Arrests
+```
+
+## A)
+```{r}
+arrest$year <- as.factor(arrest$year)
+arrest$age <- as.factor(arrest$age)
+arrest$checks <- as.factor(arrest$checks)
+```
+
+```{r}
+set.seed(13)
+ind <- sample(2,nrow(arrest), replace = T, prob = c(0.8,0.2))
+arrest.train <- arrest[ind==1,]
+arrest.test <- arrest[ind==2,]
+```
+
+##B)
+```{r}
+model.lr <- glm(released ~ colour+age+sex+employed+citizen  , data = arrest.train, family = binomial)
+summary(model.lr)
+```
+
+```{r}
+library(e1071)
+model.nb <- naiveBayes(released ~ colour+age+sex+employed+citizen, data = arrest.train)
+
+summary(model.nb)
+```
+
+## C)
+```{r}
+#arrest.predict<-predict(model.lr,newdata =arrest.test,type="response")
+#predict.lr<-as.factor((ifelse(predict>0.5,1,0)))
+
+```
+
+
+## Q no 9
+```{r}
+
+library(stats)
+city_distances <- matrix(c(
+  0, 587, 1212, 701, 1936, 604, 748, 2139, 2182, 543,
+  587, 0, 920, 940, 1745, 1188, 713, 1858, 1737, 597,
+  1212, 920, 0, 879, 831, 1726, 1611, 1949, 2204, 1494,
+  701, 940, 879, 0, 1374, 968, 1420, 1645, 1891, 1220,
+  1936, 1745, 831, 1374, 0, 2339, 2451, 347, 2734, 2300,
+  604, 1188, 1726, 968, 2339, 0, 1092, 2594, 2408, 923,
+  748, 713, 1611, 1420, 2451, 1092, 0, 2571, 678, 205,
+  2139, 1858, 1949, 1645, 347, 2594, 2571, 0, 678, 2442,
+  2182, 1737, 2204, 1891, 2734, 2408, 678, 678, 0, 2329,
+  543, 597, 1494, 1220, 2300, 923, 205, 2442, 2329, 0
+), nrow = 10, byrow = TRUE)
+
+# Assigning names to row and columns
+city_names <- c("Atlanta", "Chicago", "Denver", "Houston", "Los Angeles", "Miami",
+                "New York", "San Francisco", "Seattle", "Washington D.C.")
+rownames(city_distances) <- city_names
+colnames(city_distances) <- city_names
+```
+
+## A)
+Get dissimilarity distance as city.dissimilarity object
+```{r}
+city.dissimilarity <- as.dist(city_distances)
+print(city.dissimilarity)
+```
+
+## B)
+Fit the classical MDS model using city.dissimilarity object
+```{r}
+mds.model <- cmdscale(city.dissimilarity, eig = TRUE, k = 2)  # Dimension 2
+```
+
+## C)
+Summary of model
+```{r}
+mds.points <- mds.model$points
+print(mds.points)
+```
+## Interpretation
+
+
+## D)
+Bi-plot of the model
+```{r}
+plot(mds.points, type = "n")
+text(mds.points, labels = city_names, cex = 0.7)
+```
+
+## Interpretation
+   
+
+
+## Q no 10
+
+head(iris)
+
+
+

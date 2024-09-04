@@ -1,0 +1,431 @@
+---
+title: "Assignment 2 (Session 7, 8 & 9)"
+author: "Kaushal Khatiwada"
+date: "2024-03-08"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Reading JSON file from URL
+JSON (JavaScript Object Notation) is a text-based format for storing and transporting data.
+```{r warning=FALSE}
+library(jsonlite)
+Raw<- fromJSON("https://data.ny.gov/api/views/9a8c-vfzj/rows.json?accessType=DOWNLOAD")
+food_market<-Raw[['data']]    #Fetch data
+Names<-food_market[,14]     #Get 14th Column only
+head(Names)
+```
+
+Representation in Table format with frequency
+```{r}
+head(table(food_market[,19]))
+```
+## HTML Scrapping with R
+We can get the information from the internet using web scrapping but might be illegal if done without authorization 
+```{r warning=FALSE}
+library(rvest)
+simple<-read_html("https://dataquestio.github.io/web-scraping-pages/simple.html")
+simple %>% 
+  html_nodes("p") %>%   #Get <p> HTML tag
+  html_text()           #Extract text content
+```
+
+<h3>Scrape Covid Table from wikipedia</h3>
+Scrapping using html elements.
+```{r}
+library(rvest)
+wiki_link<-"https://en.wikipedia.org/wiki/COVID-19_pandemic_in_Nepal"
+wiki_page<-read_html(wiki_link)
+covid_table<-wiki_page %>% 
+  html_elements(".COVID-19_pandemic_data_Nepal_medical_cases") %>%    #Div class
+  html_nodes("table") %>%                                     #Get table tag
+  html_table() %>%.[[1]]                                      #Get table content
+tail(covid_table)
+```
+<h2>Data Wrangling</h2>
+
+Previously, Covid Table contains sub column [Total,New,Active]. so, we need to remove the sub column heading after concatenating the column with sub column using "_" separator.
+```{r}
+names(covid_table)<- paste(names(covid_table),covid_table[1,], sep="_")
+covid_table<-covid_table[-1,]
+tail(covid_table)
+```
+
+<h3>Renaming Column names</h3>
+```{r}
+colnames(covid_table) <- c("Date", "Confirmed_Cases_Total", 
+                           "Confirmed_Cases_New", "Confirmed_Cases_Active", 
+                           "Recoveries_Total", "Recoveries_New", "Deaths_Total", 
+                           "Deaths_New", "PCR_Total", "PCR_New", "TPR", "RR", "CFR", "Ref")
+tail(covid_table)
+```
+
+<h3>Remove "+" , "%" and ","</h3>
+Cleaning the data using gsub()function to replace the pattern.<br>
+gsub(PATTERN,REPLACEMENT,COLUMN)
+```{r}
+covid_table$Confirmed_Cases_New <- gsub('[+]', '', covid_table$Confirmed_Cases_New)
+covid_table$Recoveries_New <- gsub('[+]', '', covid_table$Recoveries_New)
+covid_table$Deaths_New <- gsub('[+]', '', covid_table$Deaths_New)
+covid_table$PCR_New <- gsub('[+]', '', covid_table$PCR_New)
+
+covid_table$TPR <- gsub('[%]', '', covid_table$TPR)
+covid_table$RR <- gsub('[%]', '', covid_table$RR)
+covid_table$CFR <- gsub('[%]', '', covid_table$CFR)
+
+covid_table$Confirmed_Cases_Total <- gsub('[,]', '', covid_table$Confirmed_Cases_Total)   #Remove "," from "Confirmed_Cases_Total" column's record
+covid_table$Confirmed_Cases_New <- gsub('[,]', '', covid_table$Confirmed_Cases_New)
+covid_table$Confirmed_Cases_Active <- gsub('[,]', '', covid_table$Confirmed_Cases_Active)
+covid_table$Recoveries_Total <- gsub('[,]', '', covid_table$Recoveries_Total)
+covid_table$Recoveries_New <- gsub('[,]', '', covid_table$Recoveries_New)
+covid_table$Deaths_Total <- gsub('[,]', '', covid_table$Deaths_Total)
+covid_table$Deaths_New <- gsub('[,]', '', covid_table$Deaths_New)
+covid_table$PCR_Total <- gsub('[,]', '', covid_table$PCR_Total)
+covid_table$PCR_New <- gsub('[,]', '', covid_table$PCR_New)
+
+tail(covid_table)
+```
+
+<h3>Convert data type from characters to integers and numeric
+```{r}
+covid_table$Confirmed_Cases_Total <- suppressWarnings(as.integer(covid_table$Confirmed_Cases_Total)) 
+covid_table$Confirmed_Cases_New <- suppressWarnings(as.integer(covid_table$Confirmed_Cases_New))
+covid_table$Confirmed_Cases_Active <- suppressWarnings(as.integer(covid_table$Confirmed_Cases_Active))
+covid_table$Recoveries_Total <- suppressWarnings(as.integer(covid_table$Recoveries_Total))
+covid_table$Recoveries_New <- suppressWarnings(as.integer(covid_table$Recoveries_New))
+covid_table$Deaths_Total <- suppressWarnings(as.integer(covid_table$Deaths_Total))
+covid_table$Deaths_New <- suppressWarnings(as.integer(covid_table$Deaths_New))
+covid_table$PCR_Total <- suppressWarnings(as.integer(covid_table$PCR_Total))
+covid_table$PCR_New <- suppressWarnings(as.integer(covid_table$PCR_New))
+
+covid_table$TPR <- as.numeric(covid_table$TPR)
+covid_table$RR <- as.numeric(covid_table$RR)
+covid_table$CFR <- as.numeric(covid_table$CFR)
+str(covid_table)
+```
+<h3>Convert Date Format</h3>
+Date was in the format of %d %b. So it is converted to %m %d.
+```{r}
+date_format <- as.Date(covid_table$Date,format = "%d %b")
+final_format <- format(date_format,"%m-%d") 
+covid_table$Date <- final_format
+tail(covid_table)
+```
+## Tibble
+A tibble is a type of data frame.
+<h3>Create Tibble</h3>
+```{r}
+library(tidyr)
+table1 <- tibble(
+  country = c("Afghanistan","Afghanistan","Brazil","Brazil","China","China"),
+  year = c(1999,2000,1999,2000,1999,2000),
+  cases = c(745,2666,37737,80488,212258,213766),
+  population = c(19987071,20595360,172006362, 174504898, 1272915272,1280428583)
+)
+table1
+```
+
+<h3>Pivoting [Longer to Wider]</h3>
+Best for standard statistical analysis
+```{r}
+table2
+table2 %>%pivot_wider(names_from = type, values_from = count)
+```
+<h3>Pivoting [Wider to Longer]</h3>
+Best for variance components analysis
+```{r}
+table4a
+table4a %>% pivot_longer(c('1999','2000'),names_to = "year",values_to="cases")
+```
+<h3>Separate</h3>
+Separate the single column into multiple column
+```{r}
+table3
+table3 %>% separate(rate,into = c("cases","population"))
+```
+<h3>Unite</h3>
+Combine multiple columns into single column
+```{r}
+table5
+table5 %>% unite(new,century,year)
+```
+
+<h4>Missing values in tibble</h4>
+Explicitly missing: 4th Quarter of 2015<br>
+Implicitly missing: 1st Quarter of 2016
+```{r}
+stocks <- tibble(
+  year = c(2015, 2015, 2015, 2015, 2016, 2016, 2016),
+  qtr = c( 1, 2, 3, 4, 2, 3, 4),                          
+  return = c(1.88, 0.59, 0.35, NA, 0.92, 0.17, 2.66)
+)
+stocks
+
+```
+
+<h4>Pivot and changing the data set to handle the missing values</h4>
+```{r}
+stocks
+stocks %>% pivot_wider(names_from = year,values_from = return)
+```
+
+<h4>Handle the missing value and drop the NA value.
+```{r}
+stocks %>% 
+  pivot_wider(names_from = year, values_from = return) %>% 
+  pivot_longer(
+    cols = c(`2015`, `2016`), 
+    names_to = "year", 
+    values_to = "return", 
+    values_drop_na = TRUE
+  )
+```
+
+<h4>Using "complete" function to handle missing value
+```{r}
+stocks %>% complete(year,qtr)
+```
+
+<h4>Tibble by row </h4>
+```{r}
+treatment <- tribble(
+  ~ person, ~ treatment, ~response,
+  "Derrick Whitmore", 1, 7,
+  NA, 2, 10,
+  NA, 3, 9,
+  "Katherine Burke", 1, 4
+)
+treatment
+```
+
+<h4>Use fill function to handle missing values</h4>
+```{r}
+treatment %>% fill(person)  
+```
+
+
+## Data Manipulation
+filter() function is used to pick the observation by their values.<br>
+arrange() function is used to reorder the rows.<br>
+select() function is used to pick the variables by their names.<br>
+mutate() function is used to create new variable with respect to existing variables<br>
+summarise() function is used to merge down the values to single summary.<br>
+Use the NYC flight on year 2013 data set.<br>
+<br>
+<br>
+<h3>Filter</h3>
+Filter flights for 25th December 2013
+```{r warning=FALSE}
+library(dplyr)
+library(nycflights13)                 #nycflights13 data
+filter(flights, month == 12,day == 25)  #filter fights on Christmas day
+```
+Using Operator to filter the flight on Either November or December
+```{r}
+filter(flights,month==11 | month==12) 
+#          OR
+#filter(flights,month==11 | 12)
+#filter(flights,month %in% c(11,12))
+```
+De Morgan's Law
+
+To filter the arrival delay and departure delay less than 120 minutes.
+```{r}
+filter(flights,!(arr_delay>120 | dep_delay>120))
+#         OR
+#filter(flights,arr_delay<=120 , dep_delay<=120)
+```
+
+<h3>Arrange</h3>
+To reorder the data set in year,month,day in descending order 
+```{r}
+arrange(flights,year,month,day)     
+```
+Most delayed Airlines<br>
+      arrange departure delay in descending order<br>
+      Get Top 20<br>
+      Represent the carrier and its dep_delay frequency in a table<br>
+```{r}
+delay<-arrange(flights,desc(dep_delay))  
+dep_delay_20<- head(delay,n=20)                           
+most_delayed_airlines_table<-table(dep_delay_20$carrier)  
+most_delayed_airlines_table
+```
+Average departed delayed time 
+```{r}
+average_departed_delay<-mean(dep_delay_20$dep_delay)
+average_departed_delay
+```
+
+<h3>Select</h3>
+```{r}
+select(flights,year,month:day)    #Column between month and day
+select(flights,-(year:day))     #Exclude column between year and day
+select(flights,time_hour,air_time)
+```
+
+<h3>Mutate</h3>
+Adds new column to existing column<br>
+Mutate gain,speed,hours and gain_per_hour column in existing.
+```{r}
+flights_sml<-select(flights,
+                    year:day,
+                    ends_with("delay"),
+                    distance,
+                    air_time
+)
+flights_sml
+mutate(flights_sml,
+       gain=dep_delay - arr_delay,
+       speed= distance / air_time * 60,
+       hours = air_time /60,
+       gain_per_hour = gain /hours
+)
+```
+<h3>Transmute</h3>
+It is used only to keep the new variables 
+```{r}
+transmute(flights,
+          gain=dep_delay - arr_delay,
+          hours = air_time/60,
+          gain_per_hour=gain/hours,
+)
+
+transmute(flights,
+          dep_time,
+          hour =dep_time %/% 100,      #Modular
+          minute =dep_time %% 100,     #Remainder
+)
+```
+<h3>Summarise</h3>
+To group the variable by value
+```{r}
+summarise(flights,delay=mean(dep_delay,na.rm=TRUE))
+by_day<-group_by(flights,year,month,day)
+summarise(by_day,delay=mean(dep_delay,na.rm=TRUE), .groups = 'drop')
+```
+
+## MULTIPLE OPERATION WITH PIPES
+Displays the mean distance of flights and mean arrival delay of flights to each destination with more than 20 flights excluding destination "HNL"
+```{r}
+delays<-flights %>% 
+  group_by(dest) %>% 
+  summarise(
+    count=n(),
+    dist=mean(distance,na.rm = TRUE),
+    delay = mean(arr_delay,na.rm = TRUE),
+  ) %>% 
+  filter(count>20,dest != "HNL")
+delays
+```
+Remove Cancelled flights
+  First, Filters only those rows where departure delay and arrival delay is not missing which means the flight has take-off and landed.
+```{r}
+not_cancelled<- flights %>% 
+  filter(!is.na(dep_delay),!is.na(arr_delay))
+not_cancelled
+```
+  Secondly, Calculate the mean departure delay for each day.
+```{r}
+not_cancelled %>% 
+  group_by(year,month,day) %>% 
+  summarise(mean=mean(dep_delay), .groups = 'drop') 
+
+``` 
+```{r}
+  hist(delays$delay)
+```
+
+
+## Summary Function
+(A) When do the first and last flights leave each day?<br>
+Calculate the minimum departure time and maximum departure time every day using min and max value of departure time
+```{r}
+not_cancelled %>% 
+  group_by(year,month,day) %>% 
+  summarise(
+    first= min(dep_time),
+    last = max(dep_time), .groups = 'drop'
+  )
+```
+On Jan 1 first departure time is 5:17 AM and last departure time is 11:56 PM.
+
+
+(B)  Why is distance to some destinations more variable than to others?<br>
+Calculates the mean distance and standard deviation distance(in descending order)
+```{r}
+not_cancelled %>% 
+  group_by(dest) %>% 
+  summarise(
+    distance_mean=mean(distance),distance_sd=sd(distance)) %>% 
+  arrange(desc(distance_sd))
+```
+
+
+(C)  Which destination have the most carries?
+
+```{r}
+not_cancelled %>% 
+  group_by(dest) %>% 
+  summarise(carriers=n_distinct(carrier)) %>% 
+  arrange(desc(carriers))
+```
+"ATL","BOS","CLT","ORD","TPA" has the most carries
+
+
+(D) How many flights left before 5am daily?<br>
+Shows the number of flights departing earlier than 5:00 AM everyday
+```{r}
+not_cancelled %>% 
+  group_by(year,month,day) %>% 
+  summarise(n_early=sum(dep_time<500), .groups = 'drop')
+```
+On Jan 1 no flight has departed earlier than 5:00 AM
+
+
+(E) what proportion of flight are delayed by more than an hour?
+```{r}
+not_cancelled %>% 
+  group_by(year,month,day) %>% 
+  summarise(hour_prop=mean(arr_delay>60),.groups = 'drop')
+```
+
+(F) Find all groups bigger than a threshold?<br>
+Display all the flights only to the destination that have more than flights in total.
+```{r}
+popular_dests<- flights %>% 
+  group_by(dest) %>% 
+  filter(n()>365)
+popular_dests
+```
+
+
+
+(G) Popular destination
+Group By destination and get the total flights and arrange in descending order.
+```{r}
+popular_destination <- flights %>%
+  group_by(dest) %>%
+  summarise(total_flights = n()) %>%
+  filter(total_flights > 365) %>%
+  arrange(desc(total_flights))
+head(popular_destination$dest)
+```
+"ORD" is the popular destination
+
+
+<h3>Slice function</h3>
+```{r}
+flights %>% slice_sample(n=5,replace = TRUE)
+set.seed(123)
+train_data <- flights %>% slice_sample(prop = 0.8)
+train_data
+test_data <- flights %>% slice_sample(prop = 0.2)
+test_data
+```
+

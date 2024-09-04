@@ -1,0 +1,4 @@
+"0","plot(cumsum(var_expalined), "
+"0","     xlab = ""Principal Components"", "
+"0","     ylab = ""Cumulative PVE"","
+"0","     col=""blue"")"

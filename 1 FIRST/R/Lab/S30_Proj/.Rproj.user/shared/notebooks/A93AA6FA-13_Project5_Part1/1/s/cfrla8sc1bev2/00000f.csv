@@ -1,0 +1,3 @@
+"0","library(FactoMineR)"
+"0","pca.1 <- PCA(nci.data, scale = TRUE, ncp = 3, graph = FALSE)"
+"0","varimax_rot <- varimax(pca.1$ind$coord[, 1:3])"

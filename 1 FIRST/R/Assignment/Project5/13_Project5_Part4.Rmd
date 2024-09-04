@@ -1,0 +1,80 @@
+---
+title: "Project 5 Part 4"
+author: "Kaushal Khatiwada"
+date: "2024-05-13"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Use “Groceries” data available in the “datasets” package
+
+## A) Load “arules” and “arulesViz” libraries
+```{r}
+library(arules)
+library(arulesViz)
+```
+
+## B) Load “Groceries” data, check its structure and interpret it carefully
+```{r}
+data(Groceries)
+str(Groceries)
+```
+
+## C) Get Frequent Item frequencies using itemFrequencyPlot function and interpret it carefully
+```{r}
+itemFrequencyPlot(Groceries, topN=20, type="absolute")
+```
+Whole milk is Frequenty used item
+
+
+## D) Set a apriori rule with support = 0.001 and confidence = 0.8 and interpret the output carefully
+```{r}
+apriori_rule <- apriori(Groceries, 
+                        parameter = list(supp = 0.001, 
+                                         conf = 0.8,
+                                         maxlen=10,
+                                         target="rules"))
+
+```
+
+## E) Show the top five rules using inspect and round the results to two digits
+```{r}
+five_rules<- inspect(apriori_rule[1:5])
+```
+
+
+
+## F) Sort the rule by confidence in decreasing order
+```{r}
+sorted_rules <- sort(apriori_rule, by = "confidence", decreasing = TRUE)
+inspect(sorted_rules[1:5])
+```
+
+
+## G) Use “whole milk” as target item and show the items in “lhs” with decreasing order of confidence and show the top five rules
+```{r}
+milk_rule <- apriori(Groceries, 
+                       parameter = list(supp = 0.001, 
+                                        conf = 0.8),
+                                        appearance = list(default="lhs",rhs="whole milk"))
+```
+```{r}
+milk_sorted_rules <- sort(milk_rule, by = "confidence", decreasing = TRUE)
+inspect(milk_sorted_rules[1:5])
+```
+
+## H) Use “whole milk” as target item and show the items in “rhs” with decreasing order of confidence and show the top five rules
+```{r}
+milk_rule1 <- apriori(Groceries, 
+                     parameter = list(supp = 0.001, 
+                                      conf = 0.8),
+                     appearance = list(default="rhs"))
+```
+
+
+## I) Write summary and conclusion based on your findings above

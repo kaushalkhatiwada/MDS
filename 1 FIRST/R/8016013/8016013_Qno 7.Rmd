@@ -1,0 +1,84 @@
+---
+title: "MDS503"
+author: '8016013'
+date: "2024-06-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 7
+
+## A)
+File "R-intro.pdf"
+```{r}
+library(pdftools)
+library(tm)
+library(wordcloud)
+library(RColorBrewer)
+library(topicmodels)
+library(tm)
+```
+
+## B)
+```{r}
+pdf_file <- "R-intro.pdf"
+# Extract text from PDF using pdftools
+pdf_text <- pdf_text(pdf_file)
+
+```
+
+
+## C)
+Perform pre-processing
+```{r, warning=FALSE}
+
+# Convert the text into a corpus using tm package
+corpus <- Corpus(VectorSource(pdf_text))
+
+# Preprocessing: Convert to lower case, remove numbers and punctuation
+corpus <- tm_map(corpus, content_transformer(tolower))
+corpus <- tm_map(corpus, removeNumbers)
+corpus <- tm_map(corpus, removePunctuation)
+corpus <- tm_map(corpus, removeWords, stopwords("en"))  # Remove English stopwords
+
+# Strip whitespace
+corpus <- tm_map(corpus, stripWhitespace)
+corpus<-tm_map(corpus,stemDocument)
+```
+
+## D)
+```{r}
+# Create Document Term Matrix
+myTdm<- TermDocumentMatrix(corpus,control = list(wordLengths=c(1,Inf)))
+
+
+# Get term frequencies
+freq.terms<-findFreqTerms(myTdm,lowfreq = 150)
+
+# Subset term frequencies for most frequent terms
+m<-as.matrix(myTdm)
+# Sort frequencies in descending order
+freq<-sort(rowSums(m),decreasing = T)
+
+new_freq<-freq[freq>50]
+
+# Extract words (terms) and their frequencies
+words <- names(new_freq)
+
+
+max(freq)
+print(words)
+```
+```{r}
+# Create barplot #Better
+barplot(new_freq, 
+        main = "Frequency of Most Frequent Terms",
+        xlab = "Terms",
+        ylab = "Frequency",
+        names.arg = words,  # Display words on x-axis
+        las = 2,  # Rotate x-axis labels if needed
+        col = "skyblue")  # Specify color if desired
+```

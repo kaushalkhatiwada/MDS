@@ -1,0 +1,6 @@
+"0","par(mfrow = c(1, 2))"
+"0","var_expalined <- pr.out$sdev^2 / sum(pr.out$sdev^2)"
+"0","plot(var_expalined, "
+"0","     xlab = ""Principal Components"", "
+"0","     ylab = ""PVE"","
+"0","     col=""red"")"
