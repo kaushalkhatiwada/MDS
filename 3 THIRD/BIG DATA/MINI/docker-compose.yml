@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  # Single Node Hadoop (NameNode + DataNode)
+  hadoop:
+    image: westernscience/hadoop
+    container_name: hadoop
+    ports:
+      - "9870:9870"  # NameNode Web UI
+      - "9000:9000"  # HDFS
+      - "8088:8088"  # YARN Web UI
+    volumes:
+      - hadoop_name:/hadoop/dfs/name
+      - hadoop_data:/hadoop/dfs/data
+    environment:
+      - HADOOP_HOME=/usr/local/hadoop
+      - PATH=/usr/local/hadoop/bin:/usr/local/hadoop/sbin:$PATH
+    command: >
+      bash -c "
+        /usr/local/hadoop/bin/hdfs namenode -format
+        /usr/local/hadoop/sbin/start-dfs.sh
+        /usr/local/hadoop/sbin/start-yarn.sh
+        tail -f /dev/null
+      "
+
+   # MongoDB
+  mongodb:
+    image: mongo:4.4.18
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    user: "999:999"  # MongoDB user in the container
+
+volumes:
+  hadoop_name:
+  hadoop_data:
+  mongodb_data: 
