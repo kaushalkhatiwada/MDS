@@ -1,0 +1,19 @@
+CREATE DATABASE (kk-db)
+CREATE COLLECTION (Students)	# db.createCollection("Students")
+	Insert Operation
+		db.Students.insertOne({name: "Kaushal Khatiwada", roll: 13, address: "Kaushaltar"})		//insertone()
+
+		db.Students.insertMany([{name: "Abin Shrestha", roll: 1, address: "Balkhu"},{name: "Anish Thapaliya", roll: 2, address: "Kalanki"}])
+	
+	Read Operation
+		db.Students.find({ address: "Kaushaltar" })		// Find specific documents with a condition
+		db.mycollection.findOne({ name: ”Nishan" })		// Find a single document
+	
+	Update Operation
+		db.Students.updateOne({ name: "Kaushal Khatiwada" }, { $set: { roll: 11 }} )	 // update
+
+	Delete Operation
+		db.Students.deleteOne({ name: "Anish" })
+
+		
+
