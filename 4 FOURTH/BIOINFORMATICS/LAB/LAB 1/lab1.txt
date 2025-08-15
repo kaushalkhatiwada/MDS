@@ -1,0 +1,15 @@
+Nucleotide BLAST
+
+https://blast.ncbi.nlm.nih.gov/Blast.cgi?PROGRAM=blastn&PAGE_TYPE=BlastSearch&LINK_LOC=blasthome
+
+1) Enter sequence
+2) Slect Database as "Nucleotide collection (nr/nt)
+3) BLAST
+4) Get information like
+	Accession ID
+	Organism name
+	Country
+
+
+Tools used: NCBI database from web
+	
