@@ -1,0 +1,9 @@
+
+1) Add multiple Accession ID for multiple sequence allignment in text file
+2) Goto Batch Entrez (https://www.ncbi.nlm.nih.gov/sites/batchentrez)
+3) Add text file and retrieve
+4) Select all items > Send to > FASTA file
+5) Open aliview and open .fasta file
+6) Select all and Align > everything
+
+Tools used: Aliview
