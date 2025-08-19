@@ -1,0 +1,15 @@
+
+1) Open raw ABI forward file from FinchTV
+2) Select the sequence and copy to notepad for both forward with >PQ1_forward and reverse with >PQ1_forward with >PQ1_reverse
+3) Save as .fasta file and import to Aliview
+4) Select Reverse sequence > Edit > Reverse Complement selected sequence
+5) Align everything from align > Realign everything
+6) Click "Highlight differences"
+7) Copy the sequence and find the sequence in FinchTV and get the score from both IF & IR (Reverse compliment IR in finch TV as well to find sequence)
+7) Correct the ATCG using highest score
+8) Merge sequence
+9) BLAST and find Query Length,	Query Cover%*, Identity%*
+
+
+Tools used: Aliview
+	    Finch TV
