@@ -1,0 +1,28 @@
+
+
+1) Add multiple Accession ID for multiple sequence allignment in text file
+2) Goto Batch Entrez (https://www.ncbi.nlm.nih.gov/sites/batchentrez)
+3) Add text file and retrieve
+4) Select all items > Send to > FASTA file
+5) Open aliview and open .fasta file
+6) Select all and Align > everything 
+7) For Global alignment [EMBOSS needle] (https://www.ebi.ac.uk/jdispatcher/psa/emboss_needle)
+	Paste first sequence and second sequence, output format "pair" (look for the gap)
+8) For Local alignment [EMBOSS water]
+	Paste first sequence and second sequence, output format "pair" (look for the gap)
+
+9) For Multiple Sequence Alignment [Clustal Omega] (https://www.ebi.ac.uk/jdispatcher/msa/clustalo?stype=protein)
+	Paste all sequences, output format "ClustalW"
+
+10) Open MEGA -> ALIGN -> edit/build alignment -> create new alignment -> DNA -> Data -> Open -> retrieve sequences from file -> select fasta file
+11) Alignment tab -> Align by ClustalW / Align by MUSCLE 
+    Data tab -> Phylogenetic analysis
+12) PHYLOGENY -> construct maximum likelihood tree -> 
+			test of phylogeny = "standard bootstrap"
+			 Bootstrap Replicates = 500
+							ok-> progress.......... Tree constructed
+									     						
+
+ 
+
+Tools Used: Mega
