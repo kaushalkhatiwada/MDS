@@ -1,0 +1,9 @@
+Primer blast : https://www.ncbi.nlm.nih.gov/tools/primer-blast/ 
+Oligo Analyzer : https://www.idtdna.com/calc/analyzer 
+				kaushal;Admin@123#
+
+1) Get fasta file and upload
+2) Database "nt" and add Organism name and Get primer > Select and Submit
+
+3) Select some nucleotide as primer from first and analyze in https://www.idtdna.com/calc/analyzer
+4) Select some nucleitide as primar complement from last and calculate Hetero-Dimer
